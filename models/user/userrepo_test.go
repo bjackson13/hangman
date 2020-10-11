@@ -4,6 +4,7 @@ import (
 	"github.com/bjackson13/hangman/models"
 	"testing"
 	"os"
+	"github.com/joho/godotenv"
 )
 
 var conn *dbconn.DB
@@ -16,7 +17,16 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	db, err := dbconn.Connect("brenbren", "password", "btj9560")
+	envErr := godotenv.Load()
+	if envErr != nil {
+		panic(envErr.Error())
+	}
+
+  	mysqlUser := os.Getenv("MYSQL_TEST_USER")
+	mysqlPass := os.Getenv("MYSQL_TEST_PASSWORD")
+	mysqlDB := os.Getenv("MYSQL_TEST_DB")
+
+	db, err := dbconn.Connect(mysqlUser, mysqlPass, mysqlDB)
 	if err != nil {
 		panic(err.Error())
 	}
