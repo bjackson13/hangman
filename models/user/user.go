@@ -1,6 +1,9 @@
 package user
 
+/*User - struct to load data into from USer table in DB*/
 type User struct {
-	UserId int
+	UserID int
 	Username string
+	IP string
+	UserAgent string
 }

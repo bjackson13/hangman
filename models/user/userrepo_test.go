@@ -17,6 +17,10 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
+	/*Load in .env file: 
+		 	if you want to run these tests you need
+			to place a .env file in this directory
+			with the same variables listed below*/
 	envErr := godotenv.Load()
 	if envErr != nil {
 		panic(envErr.Error())
@@ -50,11 +54,11 @@ func TestNew(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	userRepo := New(conn)
-	user,err := userRepo.getUser("test", "test")
+	user,err := userRepo.GetUser("test", "test")
 	if err != nil{
 		t.Errorf("Error retrieving user: %s", err.Error())
 	}
-	if user.Username != "test" && user.UserId != 1 {
+	if user.Username != "test" && user.UserID != 1 && user.IP != "192.168.1.1" && user.UserAgent != "Mozilla..." {
 		t.Errorf("Failed to retrieve user, got: %v", user)
 	}
 }
