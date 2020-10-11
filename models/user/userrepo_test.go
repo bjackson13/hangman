@@ -38,14 +38,13 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestgetUser(t *testing.T) {
+func TestGetUser(t *testing.T) {
 	userRepo := New(conn)
 	user,err := userRepo.getUser("test", "test")
 	if err != nil{
 		t.Errorf("Error retrieving user: %s", err.Error())
 	}
-	t.Log("Username: ", user.username)
-	if user.username != "test" && user.id != 1 {
+	if user.Username != "test" && user.UserId != 1 {
 		t.Errorf("Failed to retrieve user, got: %v", user)
 	}
 }

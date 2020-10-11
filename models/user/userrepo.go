@@ -29,7 +29,7 @@ func (repo *Repo) getUser(username string, password string) (User, error) {
 	defer userStmt.Close()
 	
 	var user User
-	err = userStmt.QueryRow(username, password).Scan(&user)
+	err = userStmt.QueryRow(username, password).Scan(&user.UserId, &user.Username)
 
 	return user, err
 }
