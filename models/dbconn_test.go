@@ -9,6 +9,7 @@ func TestConnect(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not connect to DB")
 	}
+	
 	err = db.connection.Ping()
 	if err != nil {
 		t.Errorf("Could not ping DB")
