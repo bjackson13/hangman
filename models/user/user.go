@@ -2,11 +2,25 @@ package user
 
 /*User - struct to load data into from USer table in DB*/
 type User struct {
-	UserID int
+	UserID int64
 	Username string
 	IP string
 	UserAgent string
 	password string
+}
+
+/*NewUser - create and return a ference to a user struct with the provided attributes set*/
+func NewUser(username string, password string, ip string, useragent string) *User {
+	user := new(User)
+	user.Username = username
+
+	/*We don't need to use the SetPassword function, 
+		but in case any more logic works it's way into the function we shoudl*/
+	user.SetPassword(password) 
+
+	user.IP = ip
+	user.UserAgent = useragent
+	return user
 }
 
 /*
