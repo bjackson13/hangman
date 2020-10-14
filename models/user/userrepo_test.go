@@ -8,7 +8,7 @@ import (
 )
 
 var conn *dbconn.DB
-var insertedID int64
+var insertedID int
 var lastLoginStamp int64
 
 func TestMain(m *testing.M) {

@@ -31,15 +31,17 @@ func AuthenticateUserLogin(username string, password string) (*user.User, error)
 }
 
 /*GenerateSessionToken use user identifying info to generate a session token*/
-func GenerateSessionToken(username string, timestamp time.Time, ip string, useragent string) string {
+func GenerateSessionToken(validUser user.User) string {
 	
 	token := tokenGen.New()
-	token.Set("username", username)
-	token.Set("ip", ip)
-	token.Set("useragent", useragent)
+
+	token.Set("id", validUser.UserID)
+	token.Set("username", validUser.Username)
+	token.Set("ip", validUser.IP)
+	token.Set("useragent", validUser.UserAgent)
 
 	//set expiration
-	token.SetExpiresAt(timestamp.Add(time.Hour * 24))
+	token.SetExpiresAt(time.Unix(validUser.LastLogin, 0).Add(time.Hour * 24))
 
 	finaltoken := token.Generate(SUPER_DUPER_SECRET_KEY)
 

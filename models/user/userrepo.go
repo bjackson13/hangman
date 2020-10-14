@@ -33,8 +33,7 @@ func (repo *Repo) GetUser(username string) (*User, error) {
 }
 
 /*AddUser - Add a user to database*/
-func (repo *Repo) AddUser(username string, password string, ip string, useragent string, lastlogin int64) (int64, error) {
-
+func (repo *Repo) AddUser(username string, password string, ip string, useragent string, lastlogin int64) (int, error) {
 	conn := repo.db.Connection
 	userStmt, err := conn.Prepare("INSERT INTO User(Username, Password, IP, UserAgent, LastLogin) VALUES (?,?,?,?,?)")
 	if err != nil {
@@ -46,7 +45,8 @@ func (repo *Repo) AddUser(username string, password string, ip string, useragent
 	if err != nil {
 		return -1, err
 	}
-	return res.LastInsertId()
+	lastID, err := res.LastInsertId()
+	return int(lastID), err
 }
 
 /*UpdateUser - update an entire user. Returns rows affected or an error*/
@@ -68,7 +68,7 @@ func (repo *Repo) UpdateUser(user User) (int64, error) {
 }
 
 /*UpdateUserIdentifiers - update just the UserAgent and IP fields of a user*/
-func (repo *Repo) UpdateUserIdentifiers(userID int64, ip string, useragent string, lastlogin int64) (int64, error) {
+func (repo *Repo) UpdateUserIdentifiers(userID int, ip string, useragent string, lastlogin int64) (int64, error) {
 	conn := repo.db.Connection
 	userStmt, err := conn.Prepare("UPDATE User SET IP = ?, UserAgent = ?, LastLogin = ? WHERE UserId = ?")
 	if err != nil {
@@ -86,7 +86,7 @@ func (repo *Repo) UpdateUserIdentifiers(userID int64, ip string, useragent strin
 }
 
 /*DeleteUser - remove a user from the DB*/
-func (repo *Repo) DeleteUser(userID int64) (int64, error) {
+func (repo *Repo) DeleteUser(userID int) (int64, error) {
 	conn := repo.db.Connection
 	userStmt, err := conn.Prepare("DELETE FROM User WHERE UserId = ?")
 	if err != nil {

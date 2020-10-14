@@ -3,6 +3,7 @@ package authentication
 import (
 	"testing"
 	"time"
+	"github.com/bjackson13/hangman/models/user"
 )
 
 func TestAuthenticateUserLogin(t *testing.T) {
@@ -51,12 +52,10 @@ func TestInvalidUserLoginValidUserInvlaidPass(t *testing.T) {
 }
 
 func TestGenerateVerifyParseSessionToken(t *testing.T) {
-	timestamp := time.Now() //mock timestamp
-	username := "auth"
-	ip := "192.168.1.1"
-	useragent :=  "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0) Gecko/20100101 Firefox/81.0"
+	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
+	testUser.UserID = 101
 
-	token := GenerateSessionToken(username, timestamp, ip, useragent)
+	token := GenerateSessionToken(*testUser)
 	if token == "" {
 		t.Errorf("invalid token generated")
 	}
@@ -71,11 +70,13 @@ func TestGenerateVerifyParseSessionToken(t *testing.T) {
 		t.Errorf("invalid token could not be parsed")
 	}
 
+	parsedID,_ := parsedtoken.GetInt("id")
 	parsedName,_ := parsedtoken.GetStr("username")
 	parsedIP,_  := parsedtoken.GetStr("ip")
 	parsedUA,_  := parsedtoken.GetStr("useragent")
+	expiredSession := parsedtoken.Validate()
 
-	if parsedName != username || parsedIP != ip || parsedUA != useragent || parsedtoken.Validate() != nil {
+	if parsedName != testUser.Username || parsedIP != testUser.IP || parsedUA != testUser.UserAgent || parsedID != testUser.UserID || expiredSession != nil {
 		t.Errorf("invalid token parsed")
 	}
 }
