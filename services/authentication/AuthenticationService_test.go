@@ -51,7 +51,7 @@ func TestInvalidUserLoginValidUserInvlaidPass(t *testing.T) {
 
 }
 
-func TestGenerateVerifyParseSessionToken(t *testing.T) {
+func TestGenerateVerifyparseSessionToken(t *testing.T) {
 	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
 	testUser.UserID = 101
 
@@ -60,29 +60,25 @@ func TestGenerateVerifyParseSessionToken(t *testing.T) {
 		t.Errorf("invalid token generated")
 	}
 
-	valid := VerifySessionToken(token)
+	valid := verifySessionToken(token)
 	if !valid {
 		t.Errorf("could not verify token")
 	}
 
-	parsedUser, expiredSession := ParseSessionToken(token)
-	if parsedUser == nil {
+	parsedUser, err := parseSessionToken(token)
+	if parsedUser == nil || err != nil {
 		t.Errorf("invalid token could not be parsed")
 	}
 
-	if expiredSession != nil {
-		t.Errorf("Session expired")
-	}
-
-	if parsedUser.Username != testUser.Username || parsedUser.IP != testUser.IP || parsedUser.UserAgent != testUser.UserAgent || parsedUser.UserID != testUser.UserID || expiredSession != nil {
+	if parsedUser.Username != testUser.Username || parsedUser.IP != testUser.IP || parsedUser.UserAgent != testUser.UserAgent || parsedUser.UserID != testUser.UserID {
 		t.Errorf("invalid token parsed")
 	}
 }
 
 func TestParseBadTokenShouldFail(t *testing.T) {
 	token := "blah"
-	testUser, badSession := ParseSessionToken(token)
-	if badSession == nil || testUser != nil {
+	testUser, err := parseSessionToken(token)
+	if err == nil || testUser != nil {
 		t.Errorf("Error should have been returned for bad session")
 	}
 }
@@ -96,8 +92,94 @@ func TestTamperedTokenFailsToVerify(t *testing.T) {
 	//tamper with token string
 	token = token + "blahblah"
 
-	valid := VerifySessionToken(token)
+	valid := verifySessionToken(token)
 	if valid {
 		t.Errorf("Token should not be verified")
+	}
+}
+
+func TestcheckSessionExpiredForUnexpiredToken(t *testing.T) {
+	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
+	testUser.UserID = 101
+
+	token := GenerateSessionToken(*testUser) 
+
+	valid := checkSessionExpired(token)
+	if !valid {
+		t.Errorf("Token should be unexpired")
+	}
+}
+
+func TestcheckSessionExpiredForExpiredToken(t *testing.T) {
+	timestamp := time.Now().Add(time.Hour * 26 * -1).Unix()// timestamp is over 24 hours ago
+	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", timestamp)
+	testUser.UserID = 101
+
+	token := GenerateSessionToken(*testUser) 
+
+	valid := checkSessionExpired(token)
+	if valid {
+		t.Errorf("Token should be expired")
+	}
+}
+
+func TestVerifyAndProcessTokenForGoodToken(t *testing.T) {
+	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
+	testUser.UserID = 101
+
+	token := GenerateSessionToken(*testUser) 
+
+	reqIP := "192.168.1.1"
+	reqUA := "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)"
+	verifiedUser, err := VerifyAndProcessToken(token, reqIP, reqUA)
+
+	if err != nil {
+		t.Log(err)
+		t.Error("Unable to parse user from token")
+	}
+
+	if testUser.Username != verifiedUser.Username || testUser.UserID != verifiedUser.UserID {
+		t.Error("Incorrect values returned")
+	}
+}
+
+func TestVerifyAndProcessTokenForBadToken(t *testing.T) {
+	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
+	testUser.UserID = 101
+
+	token := GenerateSessionToken(*testUser) 
+	token = token + "blahblah"
+
+	_, err := VerifyAndProcessToken(token, "", "")
+	if err == nil {
+		t.Error("Should have returned error when verifying token")
+	}
+}
+
+func TestVerifyAndProcessTokenForBadRequestParams(t *testing.T) {
+	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
+	testUser.UserID = 101
+
+	token := GenerateSessionToken(*testUser) 
+
+	reqIP := "129.21.12.12"
+	reqUA := "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)"
+	_, err := VerifyAndProcessToken(token, reqIP, reqUA)
+
+	if err == nil {
+		t.Error("Should have returned error when verifying request params")
+	}
+}
+
+func TestVerifyAndProcessTokenForExpiredToken(t *testing.T) {
+	timestamp := time.Now().Add(time.Hour * 26 * -1).Unix()// timestamp is over 24 hours ago
+	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", timestamp)
+	testUser.UserID = 101
+
+	token := GenerateSessionToken(*testUser) 
+
+	_, err := VerifyAndProcessToken(token, "", "")
+	if err == nil {
+		t.Error("Should have returned error when verifying token expiration")
 	}
 }

@@ -48,13 +48,38 @@ func GenerateSessionToken(validUser user.User) string {
 	return finaltoken
 }
 
+/*VerifyAndProcessToken for a given token verify it is untampered, unexpired, 
+	and finally get the token data and compare it to request data. 
+	Return User if valid or error if not*/
+func VerifyAndProcessToken(token string, requestIP string, requestUA string) (*user.User, error) {
+	if !verifySessionToken(token) { return nil, errors.New("Invalid Session Token") }
+	if !checkSessionExpired(token) { return nil, errors.New("Expired Session Token") }
+	parsedUser, err := parseSessionToken(token)
+	if err != nil { return nil, err }
+	if parsedUser.IP != requestIP || parsedUser.UserAgent != requestUA { return nil, errors.New("Bad Request") }
+	return parsedUser, nil
+}
+
 /*VerifySessionToken verifies the given session token is valid and returns values*/
-func VerifySessionToken(token string) bool {
+func verifySessionToken(token string) bool {
 	return tokenGen.Verify(token, SUPER_DUPER_SECRET_KEY)
 }
 
+/*CheckSessionExpired Verify if a token is expired or not*/
+/*True if expired.
+	False if not expired*/
+func checkSessionExpired(token string) bool {
+	claim, err := tokenGen.Parse(token)
+	// if we can't parse the token assume expired
+	if err != nil {
+		return true
+	}
+	//make sure session is stil valid
+	return claim.Validate() == nil
+}
+
 /*ParseSessionToken parse session token, supress warning*/
-func ParseSessionToken(token string) (*user.User, error) {
+func parseSessionToken(token string) (*user.User, error) {
 	claim, err := tokenGen.Parse(token)
 	if err != nil {
 		return nil, err
@@ -68,10 +93,7 @@ func ParseSessionToken(token string) (*user.User, error) {
 	parsedUser := user.NewUser(username, "", ip, useragent, int64(lastlogin))
 	parsedUser.UserID,_ = claim.GetInt("id")
 
-	//make sure session is stil valid
-	validSession := claim.Validate()
-
-	return parsedUser, validSession
+	return parsedUser, err
 }
 
 /*Internal function to comparing 2 strings hash values*/
