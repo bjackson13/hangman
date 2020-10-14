@@ -32,13 +32,13 @@ func AuthenticateUserLogin(username string, password string) (*user.User, error)
 
 /*GenerateSessionToken use user identifying info to generate a session token*/
 func GenerateSessionToken(validUser user.User) string {
-	
 	token := tokenGen.New()
 
 	token.Set("id", validUser.UserID)
 	token.Set("username", validUser.Username)
 	token.Set("ip", validUser.IP)
 	token.Set("useragent", validUser.UserAgent)
+	token.Set("lastlogin", validUser.LastLogin)
 
 	//set expiration
 	token.SetExpiresAt(time.Unix(validUser.LastLogin, 0).Add(time.Hour * 24))
@@ -54,9 +54,24 @@ func VerifySessionToken(token string) bool {
 }
 
 /*ParseSessionToken parse session token, supress warning*/
-func ParseSessionToken(token string) tokenGen.Claims {
-	claim, _ := tokenGen.Parse(token)
-	return claim
+func ParseSessionToken(token string) (*user.User, error) {
+	claim, err := tokenGen.Parse(token)
+	if err != nil {
+		return nil, err
+	}
+
+	username,_ := claim.GetStr("username")
+	ip,_ := claim.GetStr("ip")
+	useragent,_ := claim.GetStr("useragent")
+	lastlogin,_ := claim.GetInt("lastlogin")
+
+	parsedUser := user.NewUser(username, "", ip, useragent, int64(lastlogin))
+	parsedUser.UserID,_ = claim.GetInt("id")
+
+	//make sure session is stil valid
+	validSession := claim.Validate()
+
+	return parsedUser, validSession
 }
 
 /*Internal function to comparing 2 strings hash values*/

@@ -55,7 +55,7 @@ func TestGenerateVerifyParseSessionToken(t *testing.T) {
 	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
 	testUser.UserID = 101
 
-	token := GenerateSessionToken(*testUser)
+	token := GenerateSessionToken(*testUser) //dereference user, don't want values to be changed
 	if token == "" {
 		t.Errorf("invalid token generated")
 	}
@@ -65,18 +65,39 @@ func TestGenerateVerifyParseSessionToken(t *testing.T) {
 		t.Errorf("could not verify token")
 	}
 
-	parsedtoken := ParseSessionToken(token)
-	if parsedtoken == nil {
+	parsedUser, expiredSession := ParseSessionToken(token)
+	if parsedUser == nil {
 		t.Errorf("invalid token could not be parsed")
 	}
 
-	parsedID,_ := parsedtoken.GetInt("id")
-	parsedName,_ := parsedtoken.GetStr("username")
-	parsedIP,_  := parsedtoken.GetStr("ip")
-	parsedUA,_  := parsedtoken.GetStr("useragent")
-	expiredSession := parsedtoken.Validate()
+	if expiredSession != nil {
+		t.Errorf("Session expired")
+	}
 
-	if parsedName != testUser.Username || parsedIP != testUser.IP || parsedUA != testUser.UserAgent || parsedID != testUser.UserID || expiredSession != nil {
+	if parsedUser.Username != testUser.Username || parsedUser.IP != testUser.IP || parsedUser.UserAgent != testUser.UserAgent || parsedUser.UserID != testUser.UserID || expiredSession != nil {
 		t.Errorf("invalid token parsed")
+	}
+}
+
+func TestParseBadTokenShouldFail(t *testing.T) {
+	token := "blah"
+	testUser, badSession := ParseSessionToken(token)
+	if badSession == nil || testUser != nil {
+		t.Errorf("Error should have been returned for bad session")
+	}
+}
+
+func TestTamperedTokenFailsToVerify(t *testing.T) {
+	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
+	testUser.UserID = 101
+
+	token := GenerateSessionToken(*testUser) 
+
+	//tamper with token string
+	token = token + "blahblah"
+
+	valid := VerifySessionToken(token)
+	if valid {
+		t.Errorf("Token should not be verified")
 	}
 }
