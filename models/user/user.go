@@ -6,20 +6,22 @@ type User struct {
 	Username string
 	IP string
 	UserAgent string
+	LastLogin int64
 	password string
 }
 
 /*NewUser - create and return a ference to a user struct with the provided attributes set*/
-func NewUser(username string, password string, ip string, useragent string) *User {
+func NewUser(username string, password string, ip string, useragent string, login int64) *User {
 	user := new(User)
 	user.Username = username
 
 	/*We don't need to use the SetPassword function, 
-		but in case any more logic works it's way into the function we shoudl*/
+		but in case any more logic works it's way into the function we should*/
 	user.SetPassword(password) 
 
 	user.IP = ip
 	user.UserAgent = useragent
+	user.LastLogin = login
 	return user
 }
 
