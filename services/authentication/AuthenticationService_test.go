@@ -11,7 +11,7 @@ func TestAuthenticateUserLogin(t *testing.T) {
 	username := "auth"
 	password := "auth"
 
-	user, err := AuthenticateUserLogin(username, password)
+	user, err := AuthenticateUserLogin(username, password, "192.1.1.1", "chrome")
 	if err != nil {
 		t.Errorf("Failed to authenticate user: %s", err.Error())
 	}
@@ -25,7 +25,7 @@ func TestInvalidUserLoginNoUserNoPass(t *testing.T) {
 	username := ""
 	password := ""
 
-	user, err := AuthenticateUserLogin(username, password)
+	user, err := AuthenticateUserLogin(username, password, "", "")
 	if err == nil {
 		t.Errorf("Should have received error while logging in")
 	}
@@ -40,7 +40,7 @@ func TestInvalidUserLoginValidUserInvlaidPass(t *testing.T) {
 	username := "auth"
 	password := "thisisinvalid"
 
-	user, err := AuthenticateUserLogin(username, password)
+	user, err := AuthenticateUserLogin(username, password, "", "")
 	if err == nil {
 		t.Errorf("Should have received error while logging in")
 	}

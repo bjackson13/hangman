@@ -18,7 +18,7 @@ func login(c *gin.Context) {
 
 	username := c.PostForm("username")
 	password := c.PostForm("pass")
-	user, err := authService.AuthenticateUserLogin(username, password)
+	user, err := authService.AuthenticateUserLogin(username, password, c.ClientIP(), c.GetHeader("User-Agent"))
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "unauthorized",
@@ -26,9 +26,10 @@ func login(c *gin.Context) {
 	} else {
 		token := authService.GenerateSessionToken(*user)
 	
+		c.SetCookie("hjt", token, 86400, "/", "localhost", false, true)
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "authorized",
-			"hjt": token,
+			"user":	user.Username,
 		})
 	}
 }
