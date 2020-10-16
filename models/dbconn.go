@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql" /*MYSQL Driver*/
 	"github.com/joho/godotenv"
 	"os"
+	"fmt"
 )
 
 type DB struct {
@@ -23,6 +24,7 @@ func Connect() (*DB, error) {
 	mysqlDB := os.Getenv("MYSQL_DB")
 
 	connString :=  mysqlUser + ":" + mysqlPass + "@/" + mysqlDB
+	fmt.Println(connString)
 	conn, err := sql.Open("mysql", connString)
 	return &DB{conn}, err
 }

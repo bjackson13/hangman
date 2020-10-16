@@ -20,7 +20,10 @@ func AuthenticateUserLogin(username string, password string) (*user.User, error)
 	defer dbConn.Connection.Close()
 	
 	userRepo := user.NewRepo(dbConn)
-	user, err := userRepo.GetUser(username) 
+	user, err := userRepo.GetUser(username)
+	if err != nil {
+		return nil, err
+	}
 
 	validPwd := compareHashToString(user.GetPassword(), password)
 	if validPwd {
