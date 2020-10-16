@@ -26,7 +26,7 @@ func setup() {
 }
 
 func teardown() {
-	err := userRepo.DB.Close()
+	err := userRepo.Close()
 	if err != nil {
 		panic(err.Error())
 	}

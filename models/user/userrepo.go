@@ -22,6 +22,12 @@ func NewRepo() (*Repo, error) {
 	return repo, nil
 }
 
+/*Close closes the database connection*/
+func (repo *Repo) Close() error {
+	return repo.DB.Close()
+	
+}
+
 /*GetUser - get a user from the database with provided credentials*/
 func (repo *Repo) GetUser(username string) (*User, error) {
 	conn := repo.DB

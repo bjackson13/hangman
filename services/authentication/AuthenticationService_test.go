@@ -8,8 +8,8 @@ import (
 
 func TestAuthenticateUserLogin(t *testing.T) {
 	//test user in test DB
-	username := "auth"
-	password := "auth"
+	username := "bren"
+	password := "bren"
 
 	user, err := AuthenticateUserLogin(username, password, "192.1.1.1", "chrome")
 	if err != nil {

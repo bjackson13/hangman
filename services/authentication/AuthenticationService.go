@@ -13,7 +13,7 @@ var SUPER_DUPER_SECRET_KEY []byte = []byte("OMG_50_5p00ky") //this will be moved
 /*AuthenticateUserLogin - authenticates a users credentials and returns the user or an error*/
 func AuthenticateUserLogin(username string, password string, requestIP string, requestUserAgent string) (*user.User, error) {
 	userRepo, _ := user.NewRepo()
-	defer userRepo.DB.Close()
+	defer userRepo.Close()
 
 	user, err := userRepo.GetUser(username)
 	if err != nil {
