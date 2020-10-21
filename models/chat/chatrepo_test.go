@@ -8,7 +8,6 @@ import (
 
 var chatRepo *Repo
 var chatID int
-var sessionID int = 0 //reserved session for testing
 var timestamp int64 = time.Now().Unix()
 
 func TestMain(m *testing.M) {
@@ -41,7 +40,7 @@ func TestNewRepo(t *testing.T) {
 }
 
 func TestAddChat(t *testing.T) {
-	insertedChatID, err := chatRepo.AddChat(sessionID)
+	insertedChatID, err := chatRepo.AddChat()
 	if err != nil {
 		t.Errorf("Error inserting new chat into DB, %s", err.Error())
 	}
@@ -57,14 +56,14 @@ func TestAddChatUsers(t *testing.T) {
 }
 
 func TestAddMessage(t *testing.T) {
-	msgID, err := chatRepo.AddMessage(chatID, timestamp, 1, "This is a test maessage")
+	msgID, err := chatRepo.AddMessage(chatID, timestamp, 1, "This is a test message")
 	if msgID < 0 || err != nil {
 		t.Errorf("Error inserting single new message into DB, %s", err.Error())
 	}
 }
 
 func TestGetAllMessages(t *testing.T) {
-	newChat, err := chatRepo.GetAllMessages(chatID, sessionID)
+	newChat, err := chatRepo.GetAllMessages(chatID)
 	if err != nil {
 		t.Errorf("Error getting all messages from DB, %s", err.Error())
 	}
@@ -76,7 +75,7 @@ func TestGetAllMessages(t *testing.T) {
 }
 
 func TestGetMessagesSince(t *testing.T) {
-	newChat, err := chatRepo.GetMessagesSince(timestamp, chatID, sessionID)
+	newChat, err := chatRepo.GetMessagesSince(timestamp, chatID)
 	if err != nil {
 		t.Errorf("Error getting messages since %v from DB, %s", timestamp, err.Error())
 	}
@@ -84,13 +83,6 @@ func TestGetMessagesSince(t *testing.T) {
 	messages := newChat.Messages
 	if len(messages) == 0 {
 		t.Errorf("No messages found for chat, %s", err.Error())
-	}
-}
-
-func TestUpdateChatSession(t *testing.T) {
-	err := chatRepo.UpdateChatSession(1, chatID)
-	if err != nil {
-		t.Errorf("Error updating sessionId for chat, %s", err.Error())
 	}
 }
 
@@ -109,10 +101,8 @@ func TestRemoveChatMessages(t *testing.T) {
 }
 
 func TestRemoveChat(t *testing.T) {
-	err := chatRepo.RemoveChat(chatID)//session we moved chat to
+	err := chatRepo.RemoveChat(chatID)
 	if err != nil {
 		t.Errorf("Error removing chat from DB, %s", err.Error())
 	}
 }
-
-

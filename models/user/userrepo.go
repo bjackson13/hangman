@@ -30,8 +30,7 @@ func (repo *Repo) Close() error {
 
 /*GetUser - get a user from the database with provided credentials*/
 func (repo *Repo) GetUser(username string) (*User, error) {
-	conn := repo.DB
-	userStmt, err := conn.Prepare("SELECT UserId, Username, password, IP, UserAgent, LastLogin FROM User WHERE username = ?")
+	userStmt, err := repo.DB.Prepare("SELECT UserId, Username, password, IP, UserAgent, LastLogin FROM User WHERE username = ?")
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +44,7 @@ func (repo *Repo) GetUser(username string) (*User, error) {
 
 /*AddUser - Add a user to database*/
 func (repo *Repo) AddUser(username string, password string, ip string, useragent string, lastlogin int64) (int, error) {
-	conn := repo.DB
-	userStmt, err := conn.Prepare("INSERT INTO User(Username, Password, IP, UserAgent, LastLogin) VALUES (?,?,?,?,?)")
+	userStmt, err := repo.DB.Prepare("INSERT INTO User(Username, Password, IP, UserAgent, LastLogin) VALUES (?,?,?,?,?)")
 	if err != nil {
 		return -1, err
 	}
@@ -62,8 +60,7 @@ func (repo *Repo) AddUser(username string, password string, ip string, useragent
 
 /*UpdateUser - update an entire user. Returns rows affected or an error*/
 func (repo *Repo) UpdateUser(user User) (int64, error) {
-	conn := repo.DB
-	userStmt, err := conn.Prepare("UPDATE User SET Username = ?, Password = ?, IP = ?, UserAgent = ? WHERE UserId = ?")
+	userStmt, err := repo.DB.Prepare("UPDATE User SET Username = ?, Password = ?, IP = ?, UserAgent = ? WHERE UserId = ?")
 	if err != nil {
 		return 0,err
 	}
@@ -80,8 +77,7 @@ func (repo *Repo) UpdateUser(user User) (int64, error) {
 
 /*UpdateUserIdentifiers - update just the UserAgent and IP fields of a user*/
 func (repo *Repo) UpdateUserIdentifiers(userID int, ip string, useragent string, lastlogin int64) (int64, error) {
-	conn := repo.DB
-	userStmt, err := conn.Prepare("UPDATE User SET IP = ?, UserAgent = ?, LastLogin = ? WHERE UserId = ?")
+	userStmt, err := repo.DB.Prepare("UPDATE User SET IP = ?, UserAgent = ?, LastLogin = ? WHERE UserId = ?")
 	if err != nil {
 		return 0,err
 	}
@@ -98,8 +94,7 @@ func (repo *Repo) UpdateUserIdentifiers(userID int, ip string, useragent string,
 
 /*DeleteUser - remove a user from the DB*/
 func (repo *Repo) DeleteUser(userID int) (int64, error) {
-	conn := repo.DB
-	userStmt, err := conn.Prepare("DELETE FROM User WHERE UserId = ?")
+	userStmt, err := repo.DB.Prepare("DELETE FROM User WHERE UserId = ?")
 	if err != nil {
 		return 0,err
 	}

@@ -30,17 +30,17 @@ func (repo *Repo) Close() error {
 }
 
 /*GetAllMessages - get all messages from the database for a given chat*/
-func (repo *Repo) GetAllMessages(chatID int, sessionID int) (*Chat, error) {
+func (repo *Repo) GetAllMessages(chatID int) (*Chat, error) {
 	conn := repo.DB
-	chat := NewChat(chatID, sessionID, nil)
-	msgStmt, err := conn.Prepare("SELECT Chat.ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages JOIN Chat ON Messages.ChatId WHERE Chat.ChatId = ? AND SessionId = ?")
+	chat := NewChat(chatID, nil)
+	msgStmt, err := conn.Prepare("SELECT Chat.ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages JOIN Chat ON Messages.ChatId WHERE Chat.ChatId = ?")
 	if err != nil {
 		return nil, err
 	}
 	defer msgStmt.Close()
 	
 	var wg sync.WaitGroup
-	rows, err := msgStmt.Query(chatID, sessionID)
+	rows, err := msgStmt.Query(chatID)
 	for rows.Next() {
 		msg := Message{}
 		err = rows.Scan(&msg.ChatID, &msg.MessageID, &msg.Timestamp, &msg.SenderID, &msg.Text)
@@ -56,17 +56,17 @@ func (repo *Repo) GetAllMessages(chatID int, sessionID int) (*Chat, error) {
 }
 
 /*GetMessagesSince - get all messages from the database for a given chat*/
-func (repo *Repo) GetMessagesSince(timestamp int64, chatID int, sessionID int) (*Chat, error) {
+func (repo *Repo) GetMessagesSince(timestamp int64, chatID int) (*Chat, error) {
 	conn := repo.DB
-	chat := NewChat(chatID, sessionID, nil)
-	msgStmt, err := conn.Prepare("SELECT Chat.ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages JOIN Chat ON Messages.ChatId WHERE Chat.ChatId = ? AND SessionId = ? AND Timestamp >= ?")
+	chat := NewChat(chatID, nil)
+	msgStmt, err := conn.Prepare("SELECT Chat.ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages JOIN Chat ON Messages.ChatId WHERE Chat.ChatId = ? AND Timestamp >= ?")
 	if err != nil {
 		return nil, err
 	}
 	defer msgStmt.Close()
 	
 	var wg sync.WaitGroup
-	rows, err := msgStmt.Query(chatID, sessionID, timestamp)
+	rows, err := msgStmt.Query(chatID, timestamp)
 	if err != nil {
 		return nil, err
 	}
@@ -103,15 +103,15 @@ func (repo *Repo) AddMessage(chatID int, timestamp int64, senderID int, text str
 }
 
 /*AddChat make a new chat*/
-func (repo *Repo) AddChat(sessionID int) (int, error) {
+func (repo *Repo) AddChat() (int, error) {
 	conn := repo.DB
-	chatStmt, err := conn.Prepare("INSERT INTO Chat(SessionId) VALUE (?)")
+	chatStmt, err := conn.Prepare("INSERT INTO Chat VALUE()")
 	if err != nil {
 		return -1, err
 	}
 	defer chatStmt.Close()
 
-	res, err := chatStmt.Exec(sessionID)
+	res, err := chatStmt.Exec()
 	if err != nil {
 		return -1, err
 	}
@@ -119,21 +119,20 @@ func (repo *Repo) AddChat(sessionID int) (int, error) {
 	return int(lastID), err
 }
 
-/*UpdateChatSession update chat session to pass chat's between lobbies and games*/
-func (repo *Repo) UpdateChatSession(newSessionID int, chatID int) error {
+/*AddSingleChatUser add a single user to a chat*/
+func (repo *Repo) AddSingleChatUser(chatID int, user int) error {
 	conn := repo.DB
-	chatStmt, err := conn.Prepare("UPDATE Chat set SessionId = ? WHERE ChatId = ?")
+	chatStmt, err := conn.Prepare("INSERT INTO ChatUsers(UserId, ChatId) VALUES (?,?)")
 	if err != nil {
 		return err
 	}
 	defer chatStmt.Close()
 
-	_, err = chatStmt.Exec(newSessionID, chatID)
+	_, err = chatStmt.Exec(user, chatID)
 	if err != nil {
 		return err
 	}
-
-	return nil
+	return err
 }
 
 /*AddChatUsers add users to a chat*/

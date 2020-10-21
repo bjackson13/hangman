@@ -13,15 +13,11 @@ type Chat struct {
 }
 
 /*NewChat creates a new chat. You can pass in '-1' as a default value for chatID or sessionID which will not set the structs ID*/
-func NewChat(chatID int, sessionID int, messages []Message) *Chat {
+func NewChat(chatID int, messages []Message) *Chat {
 	chat := new(Chat)
 	
 	if chatID < 0 {
 		chat.ChatID = chatID
-	}
-
-	if sessionID < 0 {
-		chat.SessionID = sessionID
 	}
 
 	if len(messages) > 0 {
@@ -41,9 +37,10 @@ func (chat *Chat) AddMessage(message Message, wg *sync.WaitGroup) {
 }
 
 /*SortMessages sort messages in a chat by timestamp*/
-func (chat *Chat) SortMessages() {
+func (chat *Chat) SortMessages(wg *sync.WaitGroup) {
 	/*Keep messages sorted by time stamp*/
 	sort.Slice(chat.Messages, func(p, q int) bool {
 		return chat.Messages[p].Timestamp < chat.Messages[q].Timestamp
 	})
+	wg.Done()
 }
