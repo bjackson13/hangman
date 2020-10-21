@@ -21,14 +21,10 @@ func NewGameWord(wordText string, correctGuesses string, incorrectGuesses string
 /*AddGuess add a guess for our word, true for correct, false if not*/
 func (word *GameWord) AddGuess(isCorrectGuess bool, letter string) {
 	/*Prevent more than a letter from being written at once*/
-	if len(letter) > 1 {
-		letter = string(letter[0])
-	} 
-	
 	if isCorrectGuess {
-		word.correctGuesses = append(word.correctGuesses, letter...)
+		word.correctGuesses = append(word.correctGuesses, letter[0])
 	} else {
-		word.incorrectGuesses = append(word.incorrectGuesses, letter...)
+		word.incorrectGuesses = append(word.incorrectGuesses, letter[0])
 	}
 }
 
