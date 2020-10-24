@@ -8,7 +8,6 @@ import (
 /*Chat hold messages and info about chat*/
 type Chat struct {
 	ChatID int
-	SessionID int
 	Messages []Message
 }
 

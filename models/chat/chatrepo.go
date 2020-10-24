@@ -33,7 +33,7 @@ func (repo *Repo) Close() error {
 func (repo *Repo) GetAllMessages(chatID int) (*Chat, error) {
 	conn := repo.DB
 	chat := NewChat(chatID, nil)
-	msgStmt, err := conn.Prepare("SELECT Chat.ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages JOIN Chat ON Messages.ChatId WHERE Chat.ChatId = ?")
+	msgStmt, err := conn.Prepare("SELECT ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages WHERE ChatId = ?")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (repo *Repo) GetAllMessages(chatID int) (*Chat, error) {
 func (repo *Repo) GetMessagesSince(timestamp int64, chatID int) (*Chat, error) {
 	conn := repo.DB
 	chat := NewChat(chatID, nil)
-	msgStmt, err := conn.Prepare("SELECT Chat.ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages JOIN Chat ON Messages.ChatId WHERE Chat.ChatId = ? AND Timestamp >= ?")
+	msgStmt, err := conn.Prepare("SELECT ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages WHERE ChatId = ? AND Timestamp >= ?")
 	if err != nil {
 		return nil, err
 	}
@@ -95,23 +95,6 @@ func (repo *Repo) AddMessage(chatID int, timestamp int64, senderID int, text str
 	defer chatStmt.Close()
 
 	res, err := chatStmt.Exec(chatID, timestamp, senderID, text)
-	if err != nil {
-		return -1, err
-	}
-	lastID, err := res.LastInsertId()
-	return int(lastID), err
-}
-
-/*AddChat make a new chat*/
-func (repo *Repo) AddChat() (int, error) {
-	conn := repo.DB
-	chatStmt, err := conn.Prepare("INSERT INTO Chat VALUE()")
-	if err != nil {
-		return -1, err
-	}
-	defer chatStmt.Close()
-
-	res, err := chatStmt.Exec()
 	if err != nil {
 		return -1, err
 	}
@@ -171,22 +154,6 @@ func (repo *Repo) RemoveChatUsers(chatID int) error {
 func (repo *Repo) RemoveChatMessages(chatID int) error {
 	conn := repo.DB
 	chatStmt, err := conn.Prepare("DELETE FROM Messages WHERE ChatId = ?")
-	if err != nil {
-		return err
-	}
-	defer chatStmt.Close()
-
-	_, err = chatStmt.Exec(chatID)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
-/*RemoveChat remove a chat from Chat table by ChatID*/
-func (repo *Repo) RemoveChat(chatID int) error {
-	conn := repo.DB
-	chatStmt, err := conn.Prepare("DELETE FROM Chat WHERE ChatId = ?")
 	if err != nil {
 		return err
 	}

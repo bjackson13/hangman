@@ -7,7 +7,7 @@ import (
 )
 
 var chatRepo *Repo
-var chatID int
+var chatID int = 1
 var timestamp int64 = time.Now().Unix()
 
 func TestMain(m *testing.M) {
@@ -39,15 +39,6 @@ func TestNewRepo(t *testing.T) {
 	}
 }
 
-func TestAddChat(t *testing.T) {
-	insertedChatID, err := chatRepo.AddChat()
-	if err != nil {
-		t.Errorf("Error inserting new chat into DB, %s", err.Error())
-	}
-
-	chatID = insertedChatID	
-}
-
 func TestAddChatUsers(t *testing.T) {
 	err := chatRepo.AddChatUsers(chatID, 2, 3) //test users
 	if err != nil {
@@ -56,7 +47,7 @@ func TestAddChatUsers(t *testing.T) {
 }
 
 func TestAddMessage(t *testing.T) {
-	msgID, err := chatRepo.AddMessage(chatID, timestamp, 1, "This is a test message")
+	msgID, err := chatRepo.AddMessage(chatID, timestamp, 2, "This is a test message")
 	if msgID < 0 || err != nil {
 		t.Errorf("Error inserting single new message into DB, %s", err.Error())
 	}
@@ -68,8 +59,7 @@ func TestGetAllMessages(t *testing.T) {
 		t.Errorf("Error getting all messages from DB, %s", err.Error())
 	}
 
-	messages := newChat.Messages
-	if len(messages) == 0 {
+	if len(newChat.Messages) == 0 {
 		t.Errorf("No messages found for chat, %s", err.Error())
 	}
 }
@@ -86,13 +76,6 @@ func TestGetMessagesSince(t *testing.T) {
 	}
 }
 
-func TestRemoveChatUsers(t *testing.T) {
-	err := chatRepo.RemoveChatUsers(chatID)
-	if err != nil {
-		t.Errorf("Error removing chat users from DB, %s", err.Error())
-	}
-}
-
 func TestRemoveChatMessages(t *testing.T) {
 	err := chatRepo.RemoveChatMessages(chatID)
 	if err != nil {
@@ -100,9 +83,10 @@ func TestRemoveChatMessages(t *testing.T) {
 	}
 }
 
-func TestRemoveChat(t *testing.T) {
-	err := chatRepo.RemoveChat(chatID)
+func TestRemoveChatUsers(t *testing.T) {
+	err := chatRepo.RemoveChatUsers(chatID)
 	if err != nil {
-		t.Errorf("Error removing chat from DB, %s", err.Error())
+		t.Errorf("Error removing chat users from DB, %s", err.Error())
 	}
 }
+
