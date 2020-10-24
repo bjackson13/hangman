@@ -7,6 +7,17 @@ import (
 	"os"
 )
 
+/*Repo - Struct for CRUDing from the database*/
+type Repo struct {
+	DB *sql.DB
+}
+
+/*Close closes the database connection*/
+func (repo *Repo) Close() error {
+	return repo.DB.Close()
+	
+}
+
 /*Connect to MYSQL database */
 func Connect() (*sql.DB, error) {
 	err := godotenv.Load()

@@ -2,16 +2,15 @@ package chat
 
 import (
 	"github.com/bjackson13/hangman/models"
-	"database/sql"
+	//"database/sql"
 	"sync"
 )
 
-/*Repo - Struct for CRUDing users from the database*/
 type Repo struct {
-	DB *sql.DB
+	dbconn.Repo
 }
 
-/*NewRepo - Create new repo with acce3ss to mysql database*/
+/*NewRepo - Create new repo with access to mysql database*/
 func NewRepo() (*Repo, error) {
 	conn, err := dbconn.Connect() 
 	if err != nil {
@@ -21,12 +20,6 @@ func NewRepo() (*Repo, error) {
 	repo := new(Repo)
 	repo.DB = conn
 	return repo, nil
-}
-
-/*Close closes the database connection*/
-func (repo *Repo) Close() error {
-	return repo.DB.Close()
-	
 }
 
 /*GetAllMessages - get all messages from the database for a given chat*/
