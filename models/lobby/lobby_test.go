@@ -49,9 +49,9 @@ func TestGetAllLobbyUsers(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error getting all lobby users from DB, %s", err.Error())
 	}
-	t.Log(users)
-	if len(users) <= 0 || users[0] != 2 {
-		t.Errorf("Did not get proper number of users back, length: %v", len(users))
+	
+	if len(users) <= 0 || users[0].UserID != 2 {
+		t.Errorf("Did not get proper  users back, length: %v", users)
 	}
 }
 

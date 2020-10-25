@@ -2,6 +2,7 @@ package lobby
 
 import (
 	"github.com/bjackson13/hangman/models"
+	"github.com/bjackson13/hangman/models/user"
 	"sync"
 	"database/sql"
 )
@@ -35,28 +36,28 @@ func (repo *Repo) AddLobbyUser(userID int) error {
 	return err
 }
 
-/*GetAllLobbyUsers get all users in the lobby*/
-func (repo *Repo) GetAllLobbyUsers() ([]int, error) {
-	lobbyStmt, err := repo.DB.Prepare("SELECT UserId FROM LobbyUsers")
+/*GetAllLobbyUsers get all users in the lobby. Returns list of User structs with ID and USername filled out*/
+func (repo *Repo) GetAllLobbyUsers() ([]user.User, error) {
+	lobbyStmt, err := repo.DB.Prepare("SELECT User.UserId, User.Username FROM LobbyUsers INNER JOIN User ON LobbyUsers.UserId = User.UserId")
 	defer lobbyStmt.Close()
 	if err != nil {
 		return nil, err
 	}
 	
-	users := []int{}
+	users := []user.User{}
 	rows, err := lobbyStmt.Query()
 
 	var wg sync.WaitGroup
 	for rows.Next() {
-		var user int
-		err = rows.Scan(&user)
+		var u user.User
+		err = rows.Scan(&u.UserID, &u.Username)
 		if err != nil {
 			break;
 		}
 
 		wg.Add(1)
 		go func () {
-			users = append (users, user)
+			users = append (users, u)
 			wg.Done()
 		}()
 	}
