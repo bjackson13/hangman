@@ -45,16 +45,60 @@ func TestAddLobbyUser(t *testing.T) {
 }
 
 func TestGetAllLobbyUsers(t *testing.T) {
-	_, err := lobbyRepo.GetAllLobbyUsers()
+	users, err := lobbyRepo.GetAllLobbyUsers()
 	if err != nil {
 		t.Errorf("Error getting all lobby users from DB, %s", err.Error())
+	}
+	t.Log(users)
+	if len(users) <= 0 || users[0] != 2 {
+		t.Errorf("Did not get proper number of users back, length: %v", len(users))
 	}
 }
 
 func TestUserIsInLobby(t *testing.T) {
-	err := lobbyRepo.UserIsInLobby(2) //test users
+	isInLobby, err := lobbyRepo.UserIsInLobby(2) //test users
 	if err != nil {
 		t.Errorf("Error getting lobby user from DB, %s", err.Error())
+	}
+
+	if !isInLobby {
+		t.Errorf("User is not in lobby")
+	}
+}
+
+func TestInviteUser(t *testing.T) {
+	err := lobbyRepo.InviteUser(2, 3) //test users
+	if err != nil {
+		t.Errorf("Error adding invite to user in lobby, %s", err.Error())
+	}
+}
+
+func TestCheckInvites(t *testing.T) {
+	inviterId, err := lobbyRepo.CheckInvites(2) //test users
+	if err != nil {
+		t.Errorf("Error checking invite to user in lobby, %s", err.Error())
+	}
+
+	if inviterId != 3 {
+		t.Errorf("Wrong or no inviterId assigned to user 2: %v", inviterId)
+	}
+}
+
+func TestRevokeInvite(t *testing.T) {
+	err := lobbyRepo.RevokeInvite(2) //test users
+	if err != nil {
+		t.Errorf("Error revoking invite from lobby user from DB, %s", err.Error())
+	}
+}
+
+func TestCheckInvitesNegativeCondition(t *testing.T) {
+	inviterId, err := lobbyRepo.CheckInvites(2) //test users
+	if err != nil {
+		t.Errorf("Error checking invite to user in lobby, %s", err.Error())
+	}
+
+	if inviterId != -1 {
+		t.Errorf("Wrong inviterId assigned to user 2: %v", inviterId)
 	}
 }
 

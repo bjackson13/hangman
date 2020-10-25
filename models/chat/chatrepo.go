@@ -24,9 +24,8 @@ func NewRepo() (*Repo, error) {
 
 /*GetAllMessages - get all messages from the database for a given chat*/
 func (repo *Repo) GetAllMessages(chatID int) (*Chat, error) {
-	conn := repo.DB
 	chat := NewChat(chatID, nil)
-	msgStmt, err := conn.Prepare("SELECT ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages WHERE ChatId = ?")
+	msgStmt, err := repo.DB.Prepare("SELECT ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages WHERE ChatId = ?")
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +49,8 @@ func (repo *Repo) GetAllMessages(chatID int) (*Chat, error) {
 
 /*GetMessagesSince - get all messages from the database for a given chat*/
 func (repo *Repo) GetMessagesSince(timestamp int64, chatID int) (*Chat, error) {
-	conn := repo.DB
 	chat := NewChat(chatID, nil)
-	msgStmt, err := conn.Prepare("SELECT ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages WHERE ChatId = ? AND Timestamp >= ?")
+	msgStmt, err := repo.DB.Prepare("SELECT ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages WHERE ChatId = ? AND Timestamp >= ?")
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +78,7 @@ func (repo *Repo) GetMessagesSince(timestamp int64, chatID int) (*Chat, error) {
 
 /*AddMessage add a message to the given chat*/
 func (repo *Repo) AddMessage(chatID int, timestamp int64, senderID int, text string) (int, error) {
-	conn := repo.DB
-	chatStmt, err := conn.Prepare("INSERT INTO Messages(ChatID, Timestamp, SenderId, MessageText) VALUES (?,?,?,?)")
+	chatStmt, err := repo.DB.Prepare("INSERT INTO Messages(ChatID, Timestamp, SenderId, MessageText) VALUES (?,?,?,?)")
 	if err != nil {
 		return -1, err
 	}
@@ -97,8 +94,7 @@ func (repo *Repo) AddMessage(chatID int, timestamp int64, senderID int, text str
 
 /*AddSingleChatUser add a single user to a chat*/
 func (repo *Repo) AddSingleChatUser(chatID int, user int) error {
-	conn := repo.DB
-	chatStmt, err := conn.Prepare("INSERT INTO ChatUsers(UserId, ChatId) VALUES (?,?)")
+	chatStmt, err := repo.DB.Prepare("INSERT INTO ChatUsers(UserId, ChatId) VALUES (?,?)")
 	if err != nil {
 		return err
 	}
@@ -113,8 +109,7 @@ func (repo *Repo) AddSingleChatUser(chatID int, user int) error {
 
 /*AddChatUsers add users to a chat*/
 func (repo *Repo) AddChatUsers(chatID int, user1 int, user2 int) error {
-	conn := repo.DB
-	chatStmt, err := conn.Prepare("INSERT INTO ChatUsers(UserId, ChatId) VALUES (?,?), (?,?)")
+	chatStmt, err := repo.DB.Prepare("INSERT INTO ChatUsers(UserId, ChatId) VALUES (?,?), (?,?)")
 	if err != nil {
 		return err
 	}
@@ -129,8 +124,7 @@ func (repo *Repo) AddChatUsers(chatID int, user1 int, user2 int) error {
 
 /*RemoveChatUsers remove all users from a chat*/
 func (repo *Repo) RemoveChatUsers(chatID int) error {
-	conn := repo.DB
-	chatStmt, err := conn.Prepare("DELETE FROM ChatUsers WHERE ChatId = ?")
+	chatStmt, err := repo.DB.Prepare("DELETE FROM ChatUsers WHERE ChatId = ?")
 	if err != nil {
 		return err
 	}
@@ -145,8 +139,7 @@ func (repo *Repo) RemoveChatUsers(chatID int) error {
 
 /*RemoveChatMessages remove all messages from a chat*/
 func (repo *Repo) RemoveChatMessages(chatID int) error {
-	conn := repo.DB
-	chatStmt, err := conn.Prepare("DELETE FROM Messages WHERE ChatId = ?")
+	chatStmt, err := repo.DB.Prepare("DELETE FROM Messages WHERE ChatId = ?")
 	if err != nil {
 		return err
 	}
