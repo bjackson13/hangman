@@ -23,11 +23,6 @@ func NewRepo() (*Repo, error) {
 
 /*AddGame create a new game in the database for 2 users*/
 func (repo *Repo) AddGame(guessingUserID int, wordCreatorID int) (int, error) {
-	/*	
-		Since we can't autoincrement 2 columns with MySQL: 
-		we set the ChatId to a random number between 0-100000 based on the 2 users in the game.
-		This has the added benefit of preventing 2 users from accidently having 2 games with each other simultaniously
-	*/
 	gameStmt, err := repo.DB.Prepare("INSERT INTO Games (GuessingUserId, WordCreatorId) VALUES (?,?)")
 	defer gameStmt.Close()
 	if err != nil {
