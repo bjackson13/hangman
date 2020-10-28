@@ -2,6 +2,7 @@ package games
 
 import (
 	"github.com/bjackson13/hangman/models"
+	"database/sql"
 )
 
 type Repo struct {
@@ -41,29 +42,97 @@ func (repo *Repo) AddGame(guessingUserID int, wordCreatorID int) (int, error) {
 	return int(lastID), err
 }
 
+/*GetGameByUser get a game by querying the guesser or word creator*/
 func (repo *Repo) GetGameByUser(userID int) (*Game, error) {
-	return nil, nil
+	gameStmt, err := repo.DB.Prepare("SELECT * FROM Games WHERE GuessingUserId = ? OR WordCreatorId = ?")
+	defer gameStmt.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	var wordID sql.NullInt32
+	var guess sql.NullString
+	var game Game
+	err = gameStmt.QueryRow(userID, userID).Scan(&game.GameID, &wordID, &game.GuessingUserID, &game.WordCreatorID, &guess)
+	//word ID
+	if !wordID.Valid {
+		game.WordID = -1
+	} else {
+		game.WordID = int(wordID.Int32)
+	}
+
+	//Pending guess
+	if !guess.Valid {
+		game.PendingGuess = ""
+	} else {
+		game.PendingGuess = guess.String
+	}
+
+	return &game, err
 }
 
+/*UpdateWord updates the WordId column of a game*/
 func (repo *Repo) UpdateWord(gameID int, wordID int) error {
-	return nil
+	gameStmt, err := repo.DB.Prepare("UPDATE Games SET WordId = ? WHERE GameId = ?")
+	defer gameStmt.Close()
+	if err != nil {
+		return err
+	}
+
+	_, err = gameStmt.Exec(wordID, gameID)
+	return err
 }
 
+/*AddGuess Update the PendingGuess column of a game with the guessing users guess. Will fail if anyone but guessing user makes guess*/
 func (repo *Repo) AddGuess(guess string, gameID int, userID int) error {
-	return nil
+	gameStmt, err := repo.DB.Prepare("UPDATE Games SET PendingGuess = ? WHERE GameId = ? AND GuessingUserId = ?")
+	defer gameStmt.Close()
+	if err != nil {
+		return err
+	}
+
+	_, err = gameStmt.Exec(guess, gameID, userID)
+	return err
 }
 
+/*GetGuess check if a game has a guess and return the guess*/
 func (repo *Repo) GetGuess(gameID int, userID int) (string,error) {
-	return "", nil
+	gameStmt, err := repo.DB.Prepare("SELECT PendingGuess FROM Games WHERE GameId = ? AND WordCreatorId = ?")
+	defer gameStmt.Close()
+	if err != nil {
+		return "", err
+	}
+
+	var guess sql.NullString
+	err = gameStmt.QueryRow(gameID, userID).Scan(&guess)
+	if !guess.Valid {
+		return "", err
+	}
+	return guess.String, err
 }
 
+/*RemoveGuess set PendingGuess to NULL*/
 func (repo *Repo) RemoveGuess(gameID int) error {
-	return nil
+	gameStmt, err := repo.DB.Prepare("UPDATE Games SET PendingGuess = NULL WHERE GameId = ?")
+	defer gameStmt.Close()
+	if err != nil {
+		return err
+	}
+
+	_, err = gameStmt.Exec(gameID)
+	return err
 }
 
+/*SwapUsers make the guessing user the word creator and the word creator the guessing user*/
 func (repo *Repo) SwapUsers(gameID int) error {
-	//gameStmt, err := repo.DB.Prepare("UPDATE Games SET GuessingUserId = (@tmp:=GuessingUserId),GuessingUserId = WordCreatorId, WordCreatorId = @tmp, PendingGuess = NULL WHERE GameId = ?")
-	return nil
+	gameStmt, err := repo.DB.Prepare("UPDATE Games SET GuessingUserId = (@tmp:=GuessingUserId), GuessingUserId = WordCreatorId, WordCreatorId = @tmp, PendingGuess = NULL WHERE GameId = ?")
+	defer gameStmt.Close()
+	if err != nil {
+		return err
+	}
+
+	_, err = gameStmt.Exec(gameID)
+	return err
 } 
 
 /*RemoveGame remove game from Games table by ID. All other game related tables should be cleared before this*/

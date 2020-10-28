@@ -7,7 +7,7 @@ import (
 
 var gameRepo *Repo
 var gameID int
-var wordID int =  7 //test ID
+var wordID int =  1 //test ID
 var guessingUser int = 2
 var creatingUser int = 3
 
@@ -52,66 +52,68 @@ func TestAddGame(t *testing.T) {
 	gameID = id
 }
 
-// func TestUpdateWord(t *testing.T) {
-// 	err := gameRepo.UpdateWord(gameID,7)
-// 	if err != nil {
-// 		t.Errorf("Error updating word in game: %v", err.Error())
-// 	}
-// }
+func TestUpdateWord(t *testing.T) {
+	err := gameRepo.UpdateWord(gameID, wordID)
+	if err != nil {
+		t.Errorf("Error updating word in game: %v", err.Error())
+	}
+}
 
-// func TestGetGameByUser(t *testing.T) {
-// 	game,err := gameRepo.GetGameByUser(guessingUser)
-// 	if err != nil {
-// 		t.Errorf("Error getting game by user id: %v", err.Error())
-// 	}
+func TestGetGameByUser(t *testing.T) {
+	game,err := gameRepo.GetGameByUser(guessingUser)
+	if err != nil {
+		t.Errorf("Error getting game by user id: %v", err.Error())
+	}
 
-// 	if game.GameID != gameID || game.WordID != wordID || game.GuessingUserID != guessingUser  {
-// 		t.Errorf("Error getting game by user id: %v", game)
-// 	}
-// }
+	if game.GameID != gameID || game.WordID != wordID || game.GuessingUserID != guessingUser  {
+		t.Errorf("Error getting game by user id: %v", game)
+	}
+	t.Log(game)
+}
 
-// func TestAddGuess(t *testing.T) {
-// 	err := gameRepo.AddGuess("h", gameID, guessingUser)
-// 	if err != nil {
-// 		t.Errorf("Error adding guess to game: %v", err.Error())
-// 	}
-// }
+func TestAddGuess(t *testing.T) {
+	err := gameRepo.AddGuess("h", gameID, guessingUser)
+	if err != nil {
+		t.Errorf("Error adding guess to game: %v", err.Error())
+	}
+}
 
-// func TestGetGuess(t *testing.T) {
-// 	guess, err := gameRepo.GetGuess(gameID, creatingUser)
-// 	if err != nil {
-// 		t.Errorf("Error getting guess: %v", err.Error())
-// 	}
+func TestGetGuess(t *testing.T) {
+	guess, err := gameRepo.GetGuess(gameID, creatingUser)
+	if err != nil {
+		t.Errorf("Error getting guess: %v", err.Error())
+	}
 
-// 	if guess != "h" {
-// 		t.Errorf("Wrong value returned for guess: %v", guess)
-// 	}
-// }
+	if guess != "h" {
+		t.Errorf("Wrong value returned for guess: %v", guess)
+	}
+}
 
-// func TestRemoveGuess(t *testing.T) {
-// 	err := gameRepo.RemoveGuess(gameID)
-// 	if err != nil {
-// 		t.Errorf("Error removing guess: %v", err.Error())
-// 	}
-// }
+func TestRemoveGuess(t *testing.T) {
+	err := gameRepo.RemoveGuess(gameID)
+	if err != nil {
+		t.Errorf("Error removing guess: %v", err.Error())
+	}
+}
 
-// func TestSwapUsers(t *testing.T) {
-// 	err := gameRepo.SwapUsers(gameID)
-// 	if err != nil {
-// 		t.Errorf("Error swapping game users: %v", err.Error())
-// 	}
-// }
+func TestSwapUsers(t *testing.T) {
+	err := gameRepo.SwapUsers(gameID)
+	if err != nil {
+		t.Errorf("Error swapping game users: %v", err.Error())
+	}
+}
 
-// func TestSwappedUsersConfirm(t *testing.T) {
-// 	game,err := gameRepo.GetGameByUser(guessingUser)
-// 	if err != nil {
-// 		t.Errorf("Error getting game by user id after swap: %v", err.Error())
-// 	}
+func TestSwappedUsersConfirm(t *testing.T) {
+	game,err := gameRepo.GetGameByUser(guessingUser)
+	if err != nil {
+		t.Errorf("Error getting game by user id after swap: %v", err.Error())
+	}
 
-// 	if game.GameID != gameID || game.WordID != wordID || game.GuessingUserID != creatingUser || game.WordCreatorID != guessingUser {
-// 		t.Errorf("Error swapping users for game: %v", game)
-// 	}
-// }
+	if game.GameID != gameID || game.WordID != wordID || game.GuessingUserID != creatingUser || game.WordCreatorID != guessingUser {
+		t.Errorf("Error swapping users for game: %v", game)
+	}
+	t.Log(game)
+}
 
 func TestRemoveGame(t *testing.T) {
 	err := gameRepo.RemoveGame(gameID)

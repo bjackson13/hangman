@@ -5,6 +5,5 @@ type Game struct {
 	WordID int
 	GuessingUserID int
 	WordCreatorID int
-	ChatID int
-	PendingGuess *string
+	PendingGuess string
 }
