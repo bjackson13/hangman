@@ -2,11 +2,11 @@ package user
 
 /*User - struct to load data into from USer table in DB*/
 type User struct {
-	UserID int
-	Username string
-	IP string
-	UserAgent string
-	LastLogin int64
+	UserID int `json:userid`
+	Username string `json:username`
+	IP string	`json:ip`
+	UserAgent string `json:useragent`
+	LastLogin int64 `json:lastlogin`
 	password string
 }
 

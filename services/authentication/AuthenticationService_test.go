@@ -67,7 +67,7 @@ func TestGenerateVerifyparseSessionToken(t *testing.T) {
 
 	parsedUser, err := parseSessionToken(token)
 	if parsedUser == nil || err != nil {
-		t.Errorf("invalid token could not be parsed")
+		t.Errorf("invalid token could not be parsed: %v", err.Error())
 	}
 
 	if parsedUser.Username != testUser.Username || parsedUser.IP != testUser.IP || parsedUser.UserAgent != testUser.UserAgent || parsedUser.UserID != testUser.UserID {

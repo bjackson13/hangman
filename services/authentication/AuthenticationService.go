@@ -38,7 +38,7 @@ func AuthenticateUserLogin(username string, password string, requestIP string, r
 func GenerateSessionToken(validUser user.User) string {
 	token := tokenGen.New()
 
-	token.Set("id", validUser.UserID)
+	token.Set("userid", validUser.UserID)
 	token.Set("username", validUser.Username)
 	token.Set("ip", validUser.IP)
 	token.Set("useragent", validUser.UserAgent)
@@ -88,14 +88,9 @@ func parseSessionToken(token string) (*user.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	username,_ := claim.GetStr("username")
-	ip,_ := claim.GetStr("ip")
-	useragent,_ := claim.GetStr("useragent")
-	lastlogin,_ := claim.GetInt("lastlogin")
-
-	parsedUser := user.NewUser(username, "", ip, useragent, int64(lastlogin))
-	parsedUser.UserID,_ = claim.GetInt("id")
+	
+	var parsedUser *user.User = &user.User{}
+	err = claim.ToStruct(parsedUser)
 
 	return parsedUser, err
 }
