@@ -20,8 +20,8 @@ func login(c *gin.Context) {
 	password := c.PostForm("pass")
 	user, err := authService.AuthenticateUserLogin(username, password, c.ClientIP(), c.GetHeader("User-Agent"))
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "unauthorized",
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":  "unauthorized",
 		})
 	} else {
 		token := authService.GenerateSessionToken(*user)

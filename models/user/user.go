@@ -11,7 +11,7 @@ type User struct {
 }
 
 /*NewUser - create and return a ference to a user struct with the provided attributes set*/
-func NewUser(username string, password string, ip string, useragent string, login int64) *User {
+func NewUser(username, password, ip, useragent string, login int64) *User {
 	user := new(User)
 	user.Username = username
 
