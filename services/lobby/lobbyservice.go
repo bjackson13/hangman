@@ -1,6 +1,7 @@
 package lobby
 
 import (
+	"errors"
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/models/lobby"
 )
@@ -38,6 +39,21 @@ func (service *Service) userIsInLobby(userID int) bool {
 		return false
 	}
 	return inLobby
+}
+
+func (service *Service) inviteUserToPlay(invitee int, inviter int) error {
+	lobbyRepo, err := lobby.NewRepo()
+	defer lobbyRepo.Close()
+	if err != nil {
+		return err
+	}
+
+	inLobby, err := lobbyRepo.UserIsInLobby(invitee)
+	if !inLobby || err != nil {
+		return errors.New("Could not find user in lobby")
+	}
+	err = lobbyRepo.InviteUser(invitee, inviter)
+	return err
 }
 
 func (service *Service) removeUser(userID int) error {
