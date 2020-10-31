@@ -13,7 +13,7 @@ import (
 
 /*this test is really gross looking but I needed to verify my middleware could authenticate
 	 a user prior to calling a handler function and I could retrieve the user from the context*/
-func TestAuthMiddleWare(t *testing.T) {
+func TestAuthMiddleware(t *testing.T) {
 	testUser := user.NewUser("auth", "", "192.168.1.1", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0)", time.Now().Unix())
 	testUser.UserID = 101
 
@@ -23,7 +23,7 @@ func TestAuthMiddleWare(t *testing.T) {
 		There's probably a better way to do this but it works
 	*/
 	gin.SetMode(gin.TestMode)
-	testFunc := AuthMiddleWare()
+	testFunc := AuthMiddleware()
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	cookie := &http.Cookie{}
 	cookie.Name = "hjt"

@@ -10,6 +10,7 @@ func main()  {
 		Create a Gin router and attach routes to it through controller methods.
 	*/
 	router := gin.Default()
+	router.LoadHTMLGlob("templates/*")
 	controllers.RegisterAuthRoutes(router)
 	router.Run()
 }
