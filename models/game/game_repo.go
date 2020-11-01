@@ -49,6 +49,11 @@ func (repo *Repo) GetGameByUser(userID int) (*Game, error) {
 	var guess sql.NullString
 	var game Game
 	err = gameStmt.QueryRow(userID, userID).Scan(&game.GameID, &wordID, &game.GuessingUserID, &game.WordCreatorID, &guess)
+	
+	if err != nil {
+		return nil, err
+	}
+	
 	//word ID
 	if !wordID.Valid {
 		game.WordID = -1

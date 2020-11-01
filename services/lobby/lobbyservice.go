@@ -9,6 +9,11 @@ import (
 /*Service struct to bind our service functions to*/
 type Service struct {}
 
+/*NewService produce a new service*/
+func NewService() Service {
+	return new(Service)
+}
+
 func (service *Service) getLobbyUsers() ([]user.User, error) {
 	lobbyRepo, err := lobby.NewRepo()
 	defer lobbyRepo.Close()

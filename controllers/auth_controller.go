@@ -13,6 +13,9 @@ func RegisterAuthRoutes(router *gin.Engine) {
 	{
 		auth.POST("/login", login)
 		auth.POST("/validateLogin", AuthMiddleware(), validate)
+		auth.GET("/validateLogin", AuthMiddleware(), validate)
+		auth.GET("/logout", logout)
+		auth.POST("/logout", logout)
 	}
 }
 
@@ -34,6 +37,11 @@ func login(c *gin.Context) {
 			"user":	user.Username,
 		})
 	}
+}
+
+/*logout clear out hjt cookie effectivley invalidating users session*/
+func logout(c *gin.Context) {
+	c.SetCookie("hjt", "", 0, "/", "localhost", false, true)
 }
 
 /*validate small function to validate user logins. Primarily used for testing*/

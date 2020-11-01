@@ -23,6 +23,7 @@ func AuthMiddleware() gin.HandlerFunc {
 				return
 			}
 		}
+		
 		// if unauthorized
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
 			"error":  "Unauthorized, please log in to continue",
