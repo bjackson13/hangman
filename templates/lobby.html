@@ -35,7 +35,16 @@
   </nav>
 
   <main role="main" class="container">
-
+    <div class="container" id="card-container">
+      <div class="row mb-3">
+          {{range .LobbyUsers}}
+            <div class="col-lg-4 themed-grid-col">
+                <span id={{.UserID}}>{{.Username}}</span>
+            </div>
+          {{end}}
+      </div>
+    </div>
+    <div class="container" id="chat-container"></div>
   </main><!-- /.container -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
     integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

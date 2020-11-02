@@ -31,23 +31,27 @@ func login(c *gin.Context) {
 
 	username := c.PostForm("username")
 	password := c.PostForm("pass")
-	user, err := authService.AuthenticateUserLogin(username, password, c.ClientIP(), c.GetHeader("User-Agent"))
+	authedUser, err := authService.AuthenticateUserLogin(username, password, c.ClientIP(), c.GetHeader("User-Agent"))
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
 			"error":  "Unauthorized, please log in to continue",
 		})
 	} else {
-
+		userChan := make(chan []user.User)
 		go func() {
 			lobbyService := lobby.NewService()
-			lobbyService.AddUser(user.UserID)
+			lobbyService.AddUser(authedUser.UserID)
+			users, _ := lobbyService.GetLobbyUsers()
+			userChan <- users 
 		}()
-
-		token := authService.GenerateSessionToken(*user)
-	
+		//while we perform database operations generate the secure token
+		token := authService.GenerateSessionToken(*authedUser)
 		c.SetCookie("hjt", token, 86400, "/", "localhost", false, true)
+
+		users := <- userChan //wait for users
 		c.HTML(http.StatusOK, "lobby.html",gin.H{
-			"user":	user.Username,
+			"user":	authedUser.Username,
+			"LobbyUsers": users,
 		})
 	}
 }

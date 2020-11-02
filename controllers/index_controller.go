@@ -25,9 +25,13 @@ func directToGameOrLobby(c *gin.Context) {
 
 	userGame := gameService.GetUserGame(authedUser.UserID)
 	if userGame == nil {
-		lobbyService.AddUser(authedUser.UserID)
+		go func() {
+			lobbyService.AddUser(authedUser.UserID)
+		}()
+		users, _ := lobbyService.GetLobbyUsers()
 		c.HTML(http.StatusOK, "lobby.html",gin.H{
 			"user":	authedUser.Username,
+			"LobbyUsers": users,
 		})
 	}
 
@@ -41,12 +45,15 @@ func directToGameOrLobby(c *gin.Context) {
 func getLobby(c *gin.Context) {
 	authedUser := c.MustGet("authorized-user").(*user.User)
 	lobbyService := lobby.NewService()
-	
-	if !lobbyService.UserIsInLobby(authedUser.UserID){
-		lobbyService.AddUser(authedUser.UserID)
-	}
-	c.HTML(http.StatusOK, "lobby.html", gin.H{
+	go func() {
+		if !lobbyService.UserIsInLobby(authedUser.UserID){
+			lobbyService.AddUser(authedUser.UserID)
+		}
+	}()
+	users, _ := lobbyService.GetLobbyUsers()
+	c.HTML(http.StatusOK, "lobby.html",gin.H{
 		"user":	authedUser.Username,
+		"LobbyUsers": users,
 	})
 }
 
