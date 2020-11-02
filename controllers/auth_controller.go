@@ -66,6 +66,8 @@ func logout(c *gin.Context) {
 			gameService.EndGame(game.GameID)
 		}
 	}()
+	//redirect 
+	c.Redirect(http.StatusFound, "/auth/login")
 }
 
 /*validate small function to validate user logins. Primarily used for testing*/

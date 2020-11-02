@@ -12,7 +12,7 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      background: #60a3bc !important;
+      background: #ddd !important;
     }
 
     .user_card {
@@ -20,7 +20,7 @@
       width: 350px;
       margin-top: auto;
       margin-bottom: auto;
-      background: #f39c12;
+      background: #000;
       position: relative;
       display: flex;
       justify-content: center;
@@ -39,7 +39,7 @@
       width: 170px;
       top: -75px;
       border-radius: 50%;
-      background: #60a3bc;
+      background: #ddd;
       padding: 10px;
       text-align: center;
     }
@@ -75,11 +75,11 @@
         <div class="d-flex justify-content-center form_container">
           <form action="/auth/login" method="POST">
             <div class="form-group">
-              <label for="usernameInput">Username</label>
+              <label style="color: #fff;" for="usernameInput">Username</label>
               <input name="username" type="text" class="form-control" id="usernameInput">
             </div>
             <div class="form-group">
-              <label for="passwordInput">Password</label>
+              <label style="color: #fff;" for="passwordInput">Password</label>
               <input name="pass" type="password" class="form-control" id="passwordInput">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
