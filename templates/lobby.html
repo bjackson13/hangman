@@ -37,10 +37,13 @@
   <main role="main" class="container">
     <div class="container" id="card-container">
       <div class="row mb-3">
+          {{$user := .user}}
           {{range .LobbyUsers}}
-            <div class="col-lg-4 themed-grid-col">
-                <span id={{.UserID}}>{{.Username}}</span>
-            </div>
+            {{if ne $user .Username}}
+              <div class="col-lg-4 themed-grid-col">
+                  <span id={{.UserID}}>{{.Username}}</span>
+              </div>
+            {{end}}
           {{end}}
       </div>
     </div>
