@@ -10,11 +10,11 @@ import (
 type Service struct {}
 
 /*NewService produce a new service*/
-func NewService() Service {
+func NewService() *Service {
 	return new(Service)
 }
 
-func (service *Service) getLobbyUsers() ([]user.User, error) {
+func (service *Service) GetLobbyUsers() ([]user.User, error) {
 	lobbyRepo, err := lobby.NewRepo()
 	defer lobbyRepo.Close()
 	if err != nil {
@@ -24,7 +24,7 @@ func (service *Service) getLobbyUsers() ([]user.User, error) {
 	return lobbyRepo.GetAllLobbyUsers()
 }
 
-func (service *Service) addUser(userID int) error {
+func (service *Service) AddUser(userID int) error {
 	lobbyRepo, err := lobby.NewRepo()
 	defer lobbyRepo.Close()
 	if err != nil {
@@ -33,7 +33,7 @@ func (service *Service) addUser(userID int) error {
 	return lobbyRepo.AddLobbyUser(userID)
 }
 
-func (service *Service) userIsInLobby(userID int) bool {
+func (service *Service) UserIsInLobby(userID int) bool {
 	lobbyRepo, err := lobby.NewRepo()
 	defer lobbyRepo.Close()
 	if err != nil {
@@ -46,7 +46,7 @@ func (service *Service) userIsInLobby(userID int) bool {
 	return inLobby
 }
 
-func (service *Service) inviteUserToPlay(invitee int, inviter int) error {
+func (service *Service) InviteUserToPlay(invitee int, inviter int) error {
 	lobbyRepo, err := lobby.NewRepo()
 	defer lobbyRepo.Close()
 	if err != nil {
@@ -61,7 +61,7 @@ func (service *Service) inviteUserToPlay(invitee int, inviter int) error {
 	return err
 }
 
-func (service *Service) removeUser(userID int) error {
+func (service *Service) RemoveUser(userID int) error {
 	lobbyRepo, err := lobby.NewRepo()
 	defer lobbyRepo.Close()
 	if err != nil {

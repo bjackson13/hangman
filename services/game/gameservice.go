@@ -26,3 +26,14 @@ func (s *Service) GetUserGame(userID int) *games.Game {
 
 	return userGame
 }
+
+/*EndGame end a game by removing it*/
+func (s *Service) EndGame(gameID int) error {
+	gameRepo, err := games.NewRepo()
+	if err != nil {
+		return err
+	}
+
+	return gameRepo.RemoveGame(gameID)
+	 
+}

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/services/game"
+	"github.com/bjackson13/hangman/services/lobby"
 )
 
 /*RegisterIndexRoutes register base pages*/
@@ -20,8 +21,11 @@ func RegisterIndexRoutes(router *gin.Engine) {
 func directToGameOrLobby(c *gin.Context) {
 	authedUser := c.MustGet("authorized-user").(*user.User)
 	gameService := games.NewService()
+	lobbyService := lobby.NewService()
+
 	userGame := gameService.GetUserGame(authedUser.UserID)
 	if userGame == nil {
+		lobbyService.AddUser(authedUser.UserID)
 		c.HTML(http.StatusOK, "lobby.html",gin.H{
 			"user":	authedUser.Username,
 		})
@@ -36,6 +40,11 @@ func directToGameOrLobby(c *gin.Context) {
 
 func getLobby(c *gin.Context) {
 	authedUser := c.MustGet("authorized-user").(*user.User)
+	lobbyService := lobby.NewService()
+	
+	if !lobbyService.UserIsInLobby(authedUser.UserID){
+		lobbyService.AddUser(authedUser.UserID)
+	}
 	c.HTML(http.StatusOK, "lobby.html", gin.H{
 		"user":	authedUser.Username,
 	})

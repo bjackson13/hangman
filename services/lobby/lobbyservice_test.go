@@ -7,7 +7,7 @@ import (
 	"github.com/bjackson13/hangman/models/user"
 )
 
-func TestService_addUser(t *testing.T) {
+func TestService_AddUser(t *testing.T) {
 
 	type args struct {
 		userID int
@@ -32,14 +32,14 @@ func TestService_addUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			service := &Service{}
-			if err := service.addUser(tt.args.userID); (err != nil) != tt.wantErr {
-				t.Errorf("Service.addUser() error = %v, wantErr %v", err, tt.wantErr)
+			if err := service.AddUser(tt.args.userID); (err != nil) != tt.wantErr {
+				t.Errorf("Service.AddUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestService_getLobbyUsers(t *testing.T) {
+func TestService_GetLobbyUsers(t *testing.T) {
 	testUser := user.NewUser("postman", "", "", "", 0)
 	testUser.UserID = 3
 	tests := []struct {
@@ -57,19 +57,19 @@ func TestService_getLobbyUsers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			service := &Service{}
-			got, err := service.getLobbyUsers()
+			got, err := service.GetLobbyUsers()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Service.getLobbyUsers() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Service.GetLobbyUsers() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Service.getLobbyUsers() = %v, want %v", got, tt.want)
+				t.Errorf("Service.GetLobbyUsers() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestService_userIsInLobby(t *testing.T) {
+func TestService_UserIsInLobby(t *testing.T) {
 	type args struct {
 		userID int
 	}
@@ -93,14 +93,14 @@ func TestService_userIsInLobby(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			service := &Service{}
-			if got := service.userIsInLobby(tt.args.userID); got != tt.want {
-				t.Errorf("Service.userIsInLobby() = %v, want %v", got, tt.want)
+			if got := service.UserIsInLobby(tt.args.userID); got != tt.want {
+				t.Errorf("Service.UserIsInLobby() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestService_inviteUserToPlay(t *testing.T) {
+func TestService_InviteUserToPlay(t *testing.T) {
 	type args struct {
 		invitee int
 		inviter int
@@ -125,14 +125,14 @@ func TestService_inviteUserToPlay(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			service := &Service{}
-			if err := service.inviteUserToPlay(tt.args.invitee, tt.args.inviter); (err != nil) != tt.wantErr {
-				t.Errorf("Service.inviteUserToPlay() error = %v, wantErr %v", err, tt.wantErr)
+			if err := service.InviteUserToPlay(tt.args.invitee, tt.args.inviter); (err != nil) != tt.wantErr {
+				t.Errorf("Service.InviteUserToPlay() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestService_removeUser(t *testing.T) {
+func TestService_RemoveUser(t *testing.T) {
 	type args struct {
 		userID int
 	}
@@ -156,8 +156,8 @@ func TestService_removeUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			service := &Service{}
-			if err := service.removeUser(tt.args.userID); (err != nil) != tt.wantErr {
-				t.Errorf("Service.removeUser() error = %v, wantErr %v", err, tt.wantErr)
+			if err := service.RemoveUser(tt.args.userID); (err != nil) != tt.wantErr {
+				t.Errorf("Service.RemoveUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
