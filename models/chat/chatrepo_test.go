@@ -1,8 +1,8 @@
 package chat
 
 import (
-	"testing"
 	"os"
+	"testing"
 	"time"
 )
 
@@ -36,13 +36,6 @@ func TestNewRepo(t *testing.T) {
 	err := chatRepo.DB.Ping()
 	if err != nil {
 		t.Errorf("Failed to create chatRepo with Database connection! %s", err.Error())
-	}
-}
-
-func TestAddChatUsers(t *testing.T) {
-	err := chatRepo.AddChatUsers(chatID, 2, 3) //test users
-	if err != nil {
-		t.Errorf("Error inserting new chat users into DB, %s", err.Error())
 	}
 }
 
@@ -82,11 +75,3 @@ func TestRemoveChatMessages(t *testing.T) {
 		t.Errorf("Error removing chat messages from DB, %s", err.Error())
 	}
 }
-
-func TestRemoveChatUsers(t *testing.T) {
-	err := chatRepo.RemoveChatUsers(chatID)
-	if err != nil {
-		t.Errorf("Error removing chat users from DB, %s", err.Error())
-	}
-}
-

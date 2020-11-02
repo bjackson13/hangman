@@ -92,51 +92,6 @@ func (repo *Repo) AddMessage(chatID int, timestamp int64, senderID int, text str
 	return int(lastID), err
 }
 
-/*AddSingleChatUser add a single user to a chat*/
-func (repo *Repo) AddSingleChatUser(chatID int, user int) error {
-	chatStmt, err := repo.DB.Prepare("INSERT INTO ChatUsers(UserId, ChatId) VALUES (?,?)")
-	if err != nil {
-		return err
-	}
-	defer chatStmt.Close()
-
-	_, err = chatStmt.Exec(user, chatID)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
-/*AddChatUsers add users to a chat*/
-func (repo *Repo) AddChatUsers(chatID int, user1 int, user2 int) error {
-	chatStmt, err := repo.DB.Prepare("INSERT INTO ChatUsers(UserId, ChatId) VALUES (?,?), (?,?)")
-	if err != nil {
-		return err
-	}
-	defer chatStmt.Close()
-
-	_, err = chatStmt.Exec(user1, chatID, user2, chatID)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
-/*RemoveChatUsers remove all users from a chat*/
-func (repo *Repo) RemoveChatUsers(chatID int) error {
-	chatStmt, err := repo.DB.Prepare("DELETE FROM ChatUsers WHERE ChatId = ?")
-	if err != nil {
-		return err
-	}
-	defer chatStmt.Close()
-
-	_, err = chatStmt.Exec(chatID)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
 /*RemoveChatMessages remove all messages from a chat*/
 func (repo *Repo) RemoveChatMessages(chatID int) error {
 	chatStmt, err := repo.DB.Prepare("DELETE FROM Messages WHERE ChatId = ?")
