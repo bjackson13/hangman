@@ -14,7 +14,6 @@ func RegisterIndexRoutes(router *gin.Engine) {
 	index.Use(AuthMiddleware()) 
 	{
 		index.GET("/", directToGameOrLobby)
-		index.GET("/lobby", getLobby)
 	}
 }
 
@@ -25,10 +24,15 @@ func directToGameOrLobby(c *gin.Context) {
 
 	userGame := gameService.GetUserGame(authedUser.UserID)
 	if userGame == nil {
+		lobbyChan := make(chan []user.User)
+		/*Go add the user to the lobby and get all uses from the lobby*/
 		go func() {
 			lobbyService.AddUser(authedUser.UserID)
+			uArr, _ := lobbyService.GetLobbyUsers()
+			lobbyChan <- uArr
 		}()
-		users, _ := lobbyService.GetLobbyUsers()
+
+		users := <- lobbyChan
 		c.HTML(http.StatusOK, "lobby.html",gin.H{
 			"user":	authedUser.Username,
 			"LobbyUsers": users,
@@ -41,19 +45,3 @@ func directToGameOrLobby(c *gin.Context) {
 	})
 
 }
-
-func getLobby(c *gin.Context) {
-	authedUser := c.MustGet("authorized-user").(*user.User)
-	lobbyService := lobby.NewService()
-	go func() {
-		if !lobbyService.UserIsInLobby(authedUser.UserID){
-			lobbyService.AddUser(authedUser.UserID)
-		}
-	}()
-	users, _ := lobbyService.GetLobbyUsers()
-	c.HTML(http.StatusOK, "lobby.html",gin.H{
-		"user":	authedUser.Username,
-		"LobbyUsers": users,
-	})
-}
-

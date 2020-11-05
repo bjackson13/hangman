@@ -1,0 +1,16 @@
+{{block "user_cards" .}}
+{{$user := .user}}{{/*assign username to variable to be used in range scope*/}}
+{{range .LobbyUsers}}
+    {{if ne $user .Username}}
+        <div class="col-sm-3">
+            <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{.Username}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">User is available to play</h6>
+                <button type="button" class="btn btn-primary" onclick="invitePlayer({{.UserID}})">Invite</button>
+            </div>
+            </div>
+        </div>
+    {{end}}{{/*end if*/}}
+{{end}}{{/*end range*/}}
+{{end}}

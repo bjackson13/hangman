@@ -14,5 +14,6 @@ func main()  {
 	router.LoadHTMLGlob("templates/*")
 	controllers.RegisterIndexRoutes(router)
 	controllers.RegisterAuthRoutes(router)
+	controllers.RegisterLobbyRoutes(router)
 	router.Run()
 }
