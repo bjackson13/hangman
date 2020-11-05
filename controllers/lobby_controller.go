@@ -14,6 +14,10 @@ func RegisterLobbyRoutes(router *gin.Engine) {
 	{
 		lobbyGroup.GET("/", getLobby)
 		lobbyGroup.GET("/lobbyUsers", getLobbyUsers)
+		lobbyGroup.POST("/lobby/invite/:inviteeID", invitePlayer)
+		lobbyGroup.GET("/lobby/invite/check", checkInvites)
+		lobbyGroup.POST("/lobby/invite/accept", acceptInvite)
+		lobbyGroup.POST("/lobby/invite/deny", denyInvite)
 	}
 }
 
@@ -30,3 +34,19 @@ func getLobbyUsers(c *gin.Context) {
 		"LobbyUsers": users,
 	})
 }
+
+func invitePlayer(c *gin.Context) {
+	inviteeID := := c.Param("inviteeID")
+}
+
+func checkInvites(c *gin.Context) {
+	
+}
+
+func acceptInvite(c *gin.Context) {
+	
+}
+
+func denyInvite(c *gin.Context) {
+	
+})
