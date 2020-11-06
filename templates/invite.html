@@ -1,0 +1,18 @@
+{{block "invite" .}}
+<div class="modal" tabindex="-1" role="dialog" id="invite-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">You've been invited to play!</h5>
+      </div>
+      <div class="modal-body">
+        <p>{{.username}} has invited you to play hangman</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" onclick="acceptInvite({{.inviterID}})">Accept</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="denyInvite()">Deny</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

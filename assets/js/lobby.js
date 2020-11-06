@@ -25,17 +25,23 @@ function invitePlayer(userID) {
 
 function checkInvite() {
     $.ajax({
-        url: `/lobby/invite/check`, success: function (result, status) {
-          console.log(result)
-          console.log(status)
+        url: `/lobby/invite/check`, success: function (result, status, xhr, datatype) {
+            if (datatype == "json") {
+                console.log(result)
+                console.log(status)
+            } else {
+                console.log(result)
+                $("#modal-container").html(result);
+                $('#invite-modal').modal("show");
+            }
         }
     });
 }
 
-function acceptInvite() {
+function acceptInvite(inviterID) {
     $.ajax({
-        url: `/lobby/invite/accept`, type: "POST", success: function (result) {
-          
+        url: `/lobby/invite/accept`, data: {inviterID: inviterID}, type: "POST", success: function (result) {
+          console.log(result);
         }
     });
 }
@@ -43,7 +49,8 @@ function acceptInvite() {
 function denyInvite() {
     $.ajax({
         url: `/lobby/invite/deny`, type: "POST", success: function (result) {
-          
+            console.log(result);
+            console.log(status);
         }
     });
 }

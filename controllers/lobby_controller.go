@@ -6,6 +6,7 @@ import (
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/services/lobby"
 	"strconv"
+	"fmt"
 )
 
 /*RegisterLobbyRoutes register lobby endpoints*/
@@ -66,7 +67,7 @@ func checkInvites(c *gin.Context) {
 	}
 
 	if inviterName != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.HTML(http.StatusOK, "invite.html", gin.H{
 			"success":	"User has invite",
 			"username": inviterName,
 			"inviterID": inviterID,
@@ -85,6 +86,8 @@ func acceptInvite(c *gin.Context) {
 	/*it should be safe to skip the error check here, if one occurs the next function should blow up but be handled*/
 	inviterID, _ := strconv.Atoi(c.PostForm("inviterID")) 
 	newGameID, err := lobbyService.AcceptInvite(authedUser.UserID, inviterID)
+	fmt.Println(err)
+	fmt.Println(c.PostForm("inviterID"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":	"Could not accept invite, please try again",
