@@ -118,19 +118,21 @@ func (repo *Repo) RevokeInvite(inviteeID int) error {
 }
 
 /*CheckInvites check if a particular user id has any invites. Will return user ID who invited user or -1 for no invites*/
-func (repo *Repo) CheckInvites(inviteeID int) (int, error) {
-	lobbyStmt, err := repo.DB.Prepare("SELECT PendingInviteId FROM LobbyUsers WHERE UserId = ?")
+func (repo *Repo) CheckInvites(inviteeID int) (*string, int, error) {
+	lobbyStmt, err := repo.DB.Prepare("SELECT User.Username, LobbyUsers.PendingInviteId FROM LobbyUsers JOIN User ON LobbyUsers.PendingInviteId = User.UserID WHERE LobbyUsers.UserId = ?")
 	defer lobbyStmt.Close()
 	if err != nil {
-		return -1, err
+		return nil, -1, err
 	}
 
-	var pendingInviteID sql.NullInt32
-	err = lobbyStmt.QueryRow(inviteeID).Scan(&pendingInviteID)
-	if !pendingInviteID.Valid {
-		return -1, nil
+	var pendingInviteUsername sql.NullString
+	var pendingInviteUserID sql.NullInt32
+	err = lobbyStmt.QueryRow(inviteeID).Scan(&pendingInviteUsername, &pendingInviteUserID)
+	if !pendingInviteUsername.Valid || !pendingInviteUserID.Valid {
+		return nil, -1, nil
 	}
 	
-	inviterID := int(pendingInviteID.Int32)
-	return inviterID, err
+	inviterName := pendingInviteUsername.String
+	inviterID := int(pendingInviteUserID.Int32)
+	return &inviterName, inviterID, err
 }

@@ -22,7 +22,7 @@ func NewRepo() (*Repo, error) {
 }
 
 /*AddGame create a new game in the database for 2 users*/
-func (repo *Repo) AddGame(guessingUserID int, wordCreatorID int) (int, error) {
+func (repo *Repo) AddGame(guessingUserID, wordCreatorID int) (int, error) {
 	gameStmt, err := repo.DB.Prepare("INSERT INTO Games (GuessingUserId, WordCreatorId) VALUES (?,?)")
 	defer gameStmt.Close()
 	if err != nil {
@@ -72,7 +72,7 @@ func (repo *Repo) GetGameByUser(userID int) (*Game, error) {
 }
 
 /*UpdateWord updates the WordId column of a game*/
-func (repo *Repo) UpdateWord(gameID int, wordID int) error {
+func (repo *Repo) UpdateWord(gameID, wordID int) error {
 	gameStmt, err := repo.DB.Prepare("UPDATE Games SET WordId = ? WHERE GameId = ?")
 	defer gameStmt.Close()
 	if err != nil {
@@ -96,7 +96,7 @@ func (repo *Repo) AddGuess(guess string, gameID int, userID int) error {
 }
 
 /*GetGuess check if a game has a guess and return the guess*/
-func (repo *Repo) GetGuess(gameID int, userID int) (string,error) {
+func (repo *Repo) GetGuess(gameID, userID int) (string,error) {
 	gameStmt, err := repo.DB.Prepare("SELECT PendingGuess FROM Games WHERE GameId = ? AND WordCreatorId = ?")
 	defer gameStmt.Close()
 	if err != nil {

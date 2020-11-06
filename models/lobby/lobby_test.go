@@ -74,13 +74,13 @@ func TestInviteUser(t *testing.T) {
 }
 
 func TestCheckInvites(t *testing.T) {
-	inviterId, err := lobbyRepo.CheckInvites(2) //test users
+	inviter, id, err := lobbyRepo.CheckInvites(2) //test users
 	if err != nil {
 		t.Errorf("Error checking invite to user in lobby, %s", err.Error())
 	}
 
-	if inviterId != 3 {
-		t.Errorf("Wrong or no inviterId assigned to user 2: %v", inviterId)
+	if *inviter != "postman" && id != 3 {
+		t.Errorf("Wrong or no inviterId assigned to user 2: %v", inviter)
 	}
 }
 
@@ -92,13 +92,13 @@ func TestRevokeInvite(t *testing.T) {
 }
 
 func TestCheckInvitesNegativeCondition(t *testing.T) {
-	inviterId, err := lobbyRepo.CheckInvites(2) //test users
+	inviter, id, err := lobbyRepo.CheckInvites(2) //test users
 	if err != nil {
 		t.Errorf("Error checking invite to user in lobby, %s", err.Error())
 	}
 
-	if inviterId != -1 {
-		t.Errorf("Wrong inviterId assigned to user 2: %v", inviterId)
+	if inviter != nil && id != -1 {
+		t.Errorf("Wrong inviterId assigned to user 2: %v", inviter)
 	}
 }
 

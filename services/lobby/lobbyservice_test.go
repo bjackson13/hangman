@@ -112,13 +112,13 @@ func TestService_InviteUserToPlay(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Invite Postman to play",
-			args: args{3,2},
+			name:    "Invite Postman to play",
+			args:    args{3, 2},
 			wantErr: false,
 		},
 		{
-			name: "invite auth to play",
-			args: args{2,3},
+			name:    "invite auth to play",
+			args:    args{2, 3},
 			wantErr: true,
 		},
 	}
@@ -127,6 +127,45 @@ func TestService_InviteUserToPlay(t *testing.T) {
 			service := &Service{}
 			if err := service.InviteUserToPlay(tt.args.invitee, tt.args.inviter); (err != nil) != tt.wantErr {
 				t.Errorf("Service.InviteUserToPlay() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestService_CheckInvites(t *testing.T) {
+	type args struct {
+		userID int
+	}
+	user := "bren"
+	tests := []struct {
+		name    string
+		service *Service
+		args    args
+		want    *string
+		want1   int
+		wantErr bool
+	}{
+		{
+			name: "get invite",
+			args: args{3},
+			want: &user,
+			want1: 2,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			service := &Service{}
+			got, got1, err := service.CheckInvites(tt.args.userID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Service.CheckInvites() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if *got != *tt.want {
+				t.Errorf("Service.CheckInvites() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("Service.CheckInvites() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
