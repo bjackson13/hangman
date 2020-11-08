@@ -15,5 +15,6 @@ func main()  {
 	controllers.RegisterIndexRoutes(router)
 	controllers.RegisterAuthRoutes(router)
 	controllers.RegisterLobbyRoutes(router)
+	controllers.RegisterGameRoutes(router)
 	router.Run()
 }

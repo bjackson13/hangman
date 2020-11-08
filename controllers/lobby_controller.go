@@ -6,7 +6,6 @@ import (
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/services/lobby"
 	"strconv"
-	"fmt"
 )
 
 /*RegisterLobbyRoutes register lobby endpoints*/
@@ -30,11 +29,25 @@ func getLobby(c *gin.Context) {
 func getLobbyUsers(c *gin.Context) {
 	authedUser := c.MustGet("authorized-user").(*user.User)
 	lobbyService := lobby.NewService()
+	statusChan := make(chan bool)
+	go func() {
+		statusChan <- lobbyService.UserIsInLobby(authedUser.UserID)
+	}()
+
 	users, _ := lobbyService.GetLobbyUsers()
-	c.HTML(http.StatusOK, "user_cards.html",gin.H{
-		"user":	authedUser.Username,
-		"LobbyUsers": users,
-	})
+
+	inLobby := <- statusChan
+	
+	if !inLobby {
+		c.JSON(http.StatusFound, gin.H{
+			"url":	"/game",
+		})
+	} else {
+			c.HTML(http.StatusOK, "user_cards.html",gin.H{
+			"user":	authedUser.Username,
+			"LobbyUsers": users,
+		})
+	}
 }
 
 func invitePlayer(c *gin.Context) {
@@ -85,9 +98,8 @@ func acceptInvite(c *gin.Context) {
 
 	/*it should be safe to skip the error check here, if one occurs the next function should blow up but be handled*/
 	inviterID, _ := strconv.Atoi(c.PostForm("inviterID")) 
-	newGameID, err := lobbyService.AcceptInvite(authedUser.UserID, inviterID)
-	fmt.Println(err)
-	fmt.Println(c.PostForm("inviterID"))
+	_, err := lobbyService.AcceptInvite(authedUser.UserID, inviterID)
+	
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":	"Could not accept invite, please try again",
@@ -95,10 +107,7 @@ func acceptInvite(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "game.html",gin.H{
-		"gameID": newGameID,
-	})
-
+	c.Redirect(http.StatusFound, "/game")
 }
 
 func denyInvite(c *gin.Context) {

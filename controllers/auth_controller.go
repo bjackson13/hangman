@@ -50,6 +50,7 @@ func login(c *gin.Context) {
 
 		users := <- userChan //wait for users
 		c.HTML(http.StatusOK, "lobby.html",gin.H{
+			"title": "Lobby",
 			"user":	authedUser.Username,
 			"LobbyUsers": users,
 		})

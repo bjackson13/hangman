@@ -34,14 +34,10 @@ func directToGameOrLobby(c *gin.Context) {
 
 		users := <- lobbyChan
 		c.HTML(http.StatusOK, "lobby.html",gin.H{
+			"title": "Lobby",
 			"user":	authedUser.Username,
 			"LobbyUsers": users,
 		})
 	}
-
-	c.HTML(http.StatusOK, "game.html",gin.H{
-		"user":	authedUser.Username,
-		//need to add more down the line
-	})
-
+	c.Redirect(http.StatusFound, "/game/")
 }
