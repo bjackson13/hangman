@@ -62,7 +62,7 @@ func invitePlayer(c *gin.Context) {
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"success":	"Great success, very nice!",
+			"success":	"Great success, very nice invite!",
 		})
 	} 
 }
