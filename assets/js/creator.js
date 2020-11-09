@@ -35,3 +35,29 @@ function denyGuess() {
         }
     });    
 }
+
+function submitWord() {
+    let length = $("#word-length").val();
+    if (!(length <= 0 || length > 15 )) {
+        $.ajax({
+            url: `/game/word/create`, type: "POST", data: {length: length}, success: function (result) {
+                console.log(result)
+                $("#word-creation-modal, .modal-backdrop").remove();
+            },
+            error: function(result) {
+                console.log(result)
+                let html = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${result.error}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+            `
+            $("#pending-guess-container").prepend(html);
+            }
+        });
+    } else {
+        $("#word-length").css("border", "3px solid red");
+    }
+}
