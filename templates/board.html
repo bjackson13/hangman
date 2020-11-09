@@ -1,0 +1,20 @@
+{{block "game_board" .}}
+<div class="container">
+    <div class="row">
+        <div class="col-3" id="guess-container"></div>
+        <div class="col-6">
+            <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                version="1.1" baseProfile="full" width="300" height="300"
+                style="display: block; border: 1px solid black; background-color: whitesmoke;">
+
+
+            </svg>
+        </div>
+        {{if .isWordCreator}}
+            {{template "word_creator" .}}
+        {{else}}
+            {{template "word_guesser" .}}
+        {{end}}
+    </div>
+</div>
+{{end}}

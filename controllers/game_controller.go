@@ -22,12 +22,12 @@ func getGame(c *gin.Context) {
 
 	/*If we have a valid game*/
 	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
-		isWordCreator := game.WordCreatorID == authedUser.UserID
 		c.HTML(http.StatusOK, "game.html",gin.H{
 			"title": "Game",
 			"userID": authedUser.UserID,
 			"user":	authedUser.Username,
-			"wordCreator": isWordCreator,
+			"isWordCreator": game.WordCreatorID == authedUser.UserID,
+			"gameID": game.GameID,
 			"pendingGuess": game.PendingGuess,
 			"wordCreatorID": game.WordCreatorID,
 			"guessingUserID": game.GuessingUserID,
