@@ -1,0 +1,12 @@
+{{block "pending_guess" .}}
+    <div id="pending-guess-container">
+        <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                version="1.1" baseProfile="full" width="50" height="50">
+
+                <text x="25" y="30" font-size="30" text-anchor="middle" stroke="black" stroke-width="1" fill="black">{{.guess}}</text>
+        </svg>
+        <div id="pending-guess-buttons" class="mt-1">
+            <button type="button" class="btn btn-danger" onclick="denyGuess()">Incorrect</button>
+        </div>
+    </div>
+{{end}}

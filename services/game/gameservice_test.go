@@ -34,6 +34,34 @@ func TestService_GetUserGame(t *testing.T) {
 	}
 }
 
+func TestService_MakeGuess(t *testing.T) {
+	type args struct {
+		gameID int
+		userID int
+		guess  string
+	}
+	tests := []struct {
+		name    string
+		s       *Service
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Make a guess for valid guesser",
+			args: args{1,1,"g"},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Service{}
+			if err := s.MakeGuess(tt.args.gameID, tt.args.userID, tt.args.guess); (err != nil) != tt.wantErr {
+				t.Errorf("Service.MakeGuess() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestService_EndGame(t *testing.T) {
 	type args struct {
 		gameID int
@@ -45,8 +73,8 @@ func TestService_EndGame(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Remove nonexistent game",
-			args: args{1},
+			name:    "Remove nonexistent game",
+			args:    args{1},
 			wantErr: false,
 		},
 	}
