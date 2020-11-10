@@ -2,6 +2,7 @@ package games
 
 import (
 	"github.com/bjackson13/hangman/models/game"
+	"github.com/bjackson13/hangman/models/words"
 	"errors"
 )
 
@@ -77,11 +78,49 @@ func (s *Service) MakeGuess(gameID, userID int, guess string) error {
 }
 
 /*DenyGuess deny a guess*/
-func (s *Service) DenyGuess(gameID int) error {
+func (s *Service) DenyGuess(game games.Game) error {
 	gameRepo, err := games.NewRepo()
+	wordsRepo, err := words.NewRepo()
+	if err != nil {
+		return err
+	}
+
+	errChan := make(chan error)
+	go func() {
+		word, wErr := wordsRepo.GetWord(game.WordID)
+		if wErr != nil {
+			errChan <- wErr
+		}
+		word.AddIncorrectGuess(game.PendingGuess)
+		errChan <- wordsRepo.UpdateWordGuesses(*word)
+	}()
+
+	err = gameRepo.RemoveGuess(game.GameID)
+	if err != nil {
+		return err
+	}
+
+	return <- errChan
+
+}
+
+/*AddWord add the new game word*/
+func (s *Service) AddWord(gameID, wordLength int) error {
+	
+	if wordLength <= 0 || wordLength > 15 {
+		return errors.New("Word is too long")
+	} 
+
+	gameRepo, err := games.NewRepo()
+	wordsRepo, err := words.NewRepo()
+	if err != nil {
+		return err
+	}
+
+	wordID, err := wordsRepo.AddWord(wordLength)
 	if err != nil {
 		return err
 	}
 	
-	return gameRepo.RemoveGuess(gameID)
+	return gameRepo.UpdateWord(gameID, wordID)
 }

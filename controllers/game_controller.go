@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/services/game"
+	"strconv"
 )
 
 /*RegisterGameRoutes register game endpoints*/
@@ -16,6 +17,7 @@ func RegisterGameRoutes(router *gin.Engine) {
 		gameGroup.POST("/makeGuess", makeGuess)
 		gameGroup.GET("/guess", checkGuess)
 		gameGroup.GET("/guess/deny", denyGuess)
+		gameGroup.POST("/word/create", createWord)
 	}
 }
 
@@ -93,7 +95,28 @@ func denyGuess(c *gin.Context) {
 
 	/*If we have a valid game*/
 	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
-		err := gameService.DenyGuess(game.GameID)
+		err := gameService.DenyGuess(*game)
+		if err == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success":	"Guess denied/removed",
+			})
+			return
+		}
+	}
+	/*If user is not in game or is not the guessing user*/
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"error":	"Could not deny guess, please try again",
+	})
+}
+
+func createWord(c *gin.Context) {
+	authedUser := c.MustGet("authorized-user").(*user.User)
+	gameService := games.NewService()
+
+	/*If we have a valid game*/
+	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
+		length,_ := strconv.Atoi(c.PostForm("length"))
+		err := gameService.AddWord(game.GameID, length)
 		if err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success":	"Guess denied/removed",
