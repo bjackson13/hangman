@@ -6,7 +6,7 @@ import (
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/services/game"
 	"strconv"
-	"fmt"
+	"errors"
 )
 
 /*RegisterGameRoutes register game endpoints*/
@@ -51,11 +51,22 @@ func makeGuess(c *gin.Context) {
 	/*If we have a valid game*/
 	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
 		guess := c.PostForm("guess")
-
+		if game.PendingGuess != "" {
+			c.JSON(http.StatusOK, gin.H{
+				"error":	"Guess Already Pending",
+			})
+			return
+		}
+		alreadyMadeErr := errors.New("Guess already made")
 		err := gameService.MakeGuess(game.GameID, authedUser.UserID, game.WordID, guess)
 		if err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success":	"Guess submitted!",
+			})
+			return
+		} else if err == alreadyMadeErr {
+			c.JSON(http.StatusOK, gin.H{
+				"error":	"Guess Already Made",
 			})
 			return
 		}
@@ -98,7 +109,6 @@ func denyGuess(c *gin.Context) {
 	/*If we have a valid game*/
 	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
 		result := gameService.DenyGuess(*game)
-		fmt.Println(result)
 		if result.Error == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success":	"Guess denied/removed",
