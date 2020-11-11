@@ -9,6 +9,13 @@ import (
 /*Service struct to bind our service functions to*/
 type Service struct {}
 
+/*GuessResult tells us the outcome of a game based on a guess*/
+type GuessResult struct {
+	WordComplete bool
+	LimitExceeded bool
+	Error error
+}
+
 /*NewService produce a new service*/
 func NewService() *Service {
 	return new(Service)
@@ -57,7 +64,22 @@ func (s *Service) CheckGuesses(gameID, userID int) (string,error) {
 }
 
 /*MakeGuess submit a guess*/
-func (s *Service) MakeGuess(gameID, userID int, guess string) error {
+func (s *Service) MakeGuess(gameID, userID, wordID int, guess string) error {
+	guessChan := make(chan bool)
+	go func() {
+		wordsRepo, err := words.NewRepo()
+		defer wordsRepo.Close()
+		word, err := wordsRepo.GetWord(wordID)
+		if err != nil {
+			guessChan <- true // use true to skip adding guess if we  can't check
+			return
+		} 
+		guessChan <- word.GuessAlreadyMade(guess)
+	}()
+	
+	guessMadePreviously := <- guessChan
+
+	/*We save time (not resources unfortunatley) by making checks now and creating repos in case they are needed*/
 	gameRepo, err := games.NewRepo()
 	if err != nil {
 		return err
@@ -73,34 +95,37 @@ func (s *Service) MakeGuess(gameID, userID int, guess string) error {
 	*/
 	guess = string([]rune(guess)[0])
 
-	return gameRepo.AddGuess(guess, gameID, userID)
-	 
+	if !guessMadePreviously {
+		return gameRepo.AddGuess(guess, gameID, userID)
+
+	}
+
+	return errors.New("Guess already made")
 }
 
 /*DenyGuess deny a guess*/
-func (s *Service) DenyGuess(game games.Game) error {
+func (s *Service) DenyGuess(game games.Game) GuessResult {
 	gameRepo, err := games.NewRepo()
 	wordsRepo, err := words.NewRepo()
 	if err != nil {
-		return err
+		return GuessResult{false, false, err}
 	}
 
-	errChan := make(chan error)
+	guessChan := make(chan GuessResult)
 	go func() {
 		word, wErr := wordsRepo.GetWord(game.WordID)
 		if wErr != nil {
-			errChan <- wErr
+			guessChan <- GuessResult{false, false, wErr}
 		}
 		word.AddIncorrectGuess(game.PendingGuess)
-		errChan <- wordsRepo.UpdateWordGuesses(*word)
+		guessChan <- GuessResult{word.IsCompleted(), word.GuessLimitExceeded(), wordsRepo.UpdateWordGuesses(*word)}
 	}()
 
-	err = gameRepo.RemoveGuess(game.GameID)
-	if err != nil {
-		return err
-	}
+	go func() {
+		gameRepo.RemoveGuess(game.GameID)
+	}()
 
-	return <- errChan
+	return <- guessChan
 
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/services/game"
 	"strconv"
+	"fmt"
 )
 
 /*RegisterGameRoutes register game endpoints*/
@@ -50,7 +51,8 @@ func makeGuess(c *gin.Context) {
 	/*If we have a valid game*/
 	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
 		guess := c.PostForm("guess")
-		err := gameService.MakeGuess(game.GameID, authedUser.UserID, guess)
+
+		err := gameService.MakeGuess(game.GameID, authedUser.UserID, game.WordID, guess)
 		if err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success":	"Guess submitted!",
@@ -95,10 +97,12 @@ func denyGuess(c *gin.Context) {
 
 	/*If we have a valid game*/
 	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
-		err := gameService.DenyGuess(*game)
-		if err == nil {
+		result := gameService.DenyGuess(*game)
+		fmt.Println(result)
+		if result.Error == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success":	"Guess denied/removed",
+				"GuessesExceeded": result.LimitExceeded,
 			})
 			return
 		}
@@ -119,13 +123,13 @@ func createWord(c *gin.Context) {
 		err := gameService.AddWord(game.GameID, length)
 		if err == nil {
 			c.JSON(http.StatusOK, gin.H{
-				"success":	"Guess denied/removed",
+				"success":	"Word created",
 			})
 			return
 		}
 	}
 	/*If user is not in game or is not the guessing user*/
 	c.JSON(http.StatusInternalServerError, gin.H{
-		"error":	"Could not deny guess, please try again",
+		"error":	"Could not create word, please try again",
 	})
 }

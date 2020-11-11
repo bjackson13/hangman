@@ -1,6 +1,8 @@
 package words
 
-import "strings"
+import (
+	"strings"
+)
 
 /*GameWord - represents the word our game is centered around*/
 type GameWord struct {
@@ -10,13 +12,7 @@ type GameWord struct {
 	incorrectGuesses []string
 }
 
-/*NewGameWord create new game word*/
-func NewGameWord(wordLength int) *GameWord {
-	word := new(GameWord)
-	word.Length = wordLength
-	word.correctGuesses = make([]string, word.Length)
-	return word
-}
+var maxIncorrectGuesses = 7
 
 /*AddCorrectGuess add a correct guess to our word. Takes the letter to be added and the indexes to set as correct*/
 func (word *GameWord) AddCorrectGuess(letter string, indexes []int) {
@@ -31,8 +27,12 @@ func (word *GameWord) AddCorrectGuess(letter string, indexes []int) {
 /*AddIncorrectGuess add an incorrect guess*/
 func (word *GameWord) AddIncorrectGuess(letter string) {
 	/*Prevent more than a letter from being written at once by using [0]*/
-	word.incorrectGuesses = append(word.incorrectGuesses, string(letter[0]))
-		
+	for i := 0; i < len(word.incorrectGuesses); i++ {
+		if word.incorrectGuesses[i] == "" {
+			word.incorrectGuesses[i] = string(letter[0])
+			break
+		}
+	}
 }
 
 /*GetCorrectGuesses return correct guesses in CSV format*/
@@ -47,20 +47,71 @@ func (word *GameWord) GetIncorrectGuesses() string {
 
 /*SetCorrectGuesses set correct guesses*/
 func (word *GameWord) SetCorrectGuesses(guesses string) {
-	word.correctGuesses = []string{guesses}
+	word.correctGuesses = make([]string, word.Length)
+	for i,v := range strings.Split(guesses, ",") {
+		word.correctGuesses[i] = v
+	}
 }
 
 /*SetIncorrectGuesses set incorrect guesses*/
 func (word *GameWord) SetIncorrectGuesses(guesses string) {
-	word.incorrectGuesses = []string{guesses}
+	if word.Length < 7 {
+		word.incorrectGuesses = make([]string, word.Length, word.Length)
+	} else {
+		word.incorrectGuesses = make([]string, 7, 7)
+	}
+	for i,v := range strings.Split(guesses, ",") {
+		word.incorrectGuesses[i] = v
+	}
 }
 
-/*isCompleted returns if the word has been completely guessed or not*/
-func (word *GameWord) isCompleted() bool {
+/*IsCompleted returns if the word has been completely guessed or not*/
+func (word *GameWord) IsCompleted() bool {
 	for _, v := range word.correctGuesses {
 		if v == "" {
 			return false
 		}
 	} 
 	return true
+}
+
+/*GuessLimitExceeded check if user has submitted too many incorrect guesses*/
+func (word *GameWord) GuessLimitExceeded() bool {
+	for i := 0; i < len(word.incorrectGuesses); i++ {
+		if word.incorrectGuesses[i] == "" {
+			return false
+		}
+	} 
+	return true
+}
+
+/*GuessAlreadyMade check if guess was already made*/
+func (word *GameWord) GuessAlreadyMade(guess string) bool {
+	check := make(chan bool, 2)
+	go func() {
+		found := false
+		for _,v := range word.correctGuesses {
+			if v == string(guess[0]) {
+				found = true
+				break
+			}
+		}
+		check <- found
+	}()
+
+	go func() {
+		found := false
+		for _,v := range word.incorrectGuesses {
+			if v == string(guess[0]) {
+				found = true
+				break
+			}
+		}
+		check <- found
+	}()
+	
+	found1 := <- check 
+	found2 := <- check
+
+	return found1 || found2
 }

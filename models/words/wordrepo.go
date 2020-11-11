@@ -2,6 +2,7 @@ package words
 
 import (
 	"github.com/bjackson13/hangman/models"
+	"database/sql"
 )
 
 type Repo struct {
@@ -30,11 +31,20 @@ func (repo *Repo) GetWord(wordID int) (*GameWord, error) {
 	}
 	
 	var word GameWord
-	var correctGuesses string
-	var incorrectGuesses string
+	var correctGuesses sql.NullString
+	var incorrectGuesses sql.NullString
 	err = wordStmt.QueryRow(wordID).Scan(&word.WordID, &word.Length, &correctGuesses, &incorrectGuesses)
-	word.SetCorrectGuesses(correctGuesses)
-	word.SetIncorrectGuesses(incorrectGuesses)
+	if correctGuesses.Valid {
+		word.SetCorrectGuesses(correctGuesses.String)
+	} else {
+		word.SetCorrectGuesses("")
+	}
+		
+	if incorrectGuesses.Valid {
+		word.SetIncorrectGuesses(incorrectGuesses.String)
+	} else {
+		word.SetIncorrectGuesses("")
+	}
 	return &word, err
 }
 
