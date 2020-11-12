@@ -61,8 +61,8 @@ func TestGetWord(t *testing.T) {
 		t.Errorf("Error getting word from DB, %s", err.Error())
 	}
 
-	if word.Length != 4 || word.GetCorrectGuesses() != "t,,,t" || word.GetIncorrectGuesses() != "q,r,," {
-		t.Errorf("Correct values not retireved from DB, %v %s %s", word.Length, word.GetCorrectGuesses(), word.GetIncorrectGuesses())
+	if word.Length != 4 || word.CorrectToString() != "t,,,t" || word.IncorrectToString() != "q,r,," {
+		t.Errorf("Correct values not retireved from DB, %v %s %s", word.Length, word.CorrectToString(), word.IncorrectToString())
 	}
 }
 
@@ -78,7 +78,7 @@ func TestUpdateword(t *testing.T) {
 		t.Errorf("Error getting updated word from DB, %s", err.Error())
 	}
 	
-	if word.Length != 5 || word.GetCorrectGuesses() != ",,,," || word.GetIncorrectGuesses() != ",,,," {
+	if word.Length != 5 || word.CorrectToString() != ",,,," || word.IncorrectToString() != ",,,," {
 		t.Errorf("Correct values not retireved from DB: %v", word)
 	}
 }
@@ -100,7 +100,7 @@ func TestIsCompleted(t *testing.T) {
 	word.AddIncorrectGuess("r")
 
 	if word.IsCompleted() {
-		t.Errorf("Word should not be completed: %s", word.GetCorrectGuesses())
+		t.Errorf("Word should not be completed: %s", word.CorrectToString())
 	}
 
 	t.Log(word.GuessLimitExceeded())
@@ -108,7 +108,7 @@ func TestIsCompleted(t *testing.T) {
 	word.AddCorrectGuess("s", []int{2})
 
 	if !word.IsCompleted() {
-		t.Errorf("Word should not completed: %s", word.GetCorrectGuesses())
+		t.Errorf("Word should not completed: %s", word.CorrectToString())
 	}
 }
 

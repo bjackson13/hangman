@@ -36,12 +36,22 @@ func (word *GameWord) AddIncorrectGuess(letter string) {
 }
 
 /*GetCorrectGuesses return correct guesses in CSV format*/
-func (word *GameWord) GetCorrectGuesses() string {
-	return strings.Join(word.correctGuesses, ",")
+func (word *GameWord) GetCorrectGuesses() []string {
+	return word.correctGuesses
 }
 
 /*GetIncorrectGuesses return incorrect guesses in CSV format*/
-func (word *GameWord) GetIncorrectGuesses() string {
+func (word *GameWord) GetIncorrectGuesses() []string {
+	return word.incorrectGuesses
+}
+
+/*CorrectToString for use in repo*/
+func(word *GameWord) CorrectToString() string {
+	return strings.Join(word.correctGuesses, ",")
+}
+
+/*IncorrectToString for use in repo*/
+func (word *GameWord) IncorrectToString() string {
 	return strings.Join(word.incorrectGuesses, ",")
 }
 
@@ -55,10 +65,10 @@ func (word *GameWord) SetCorrectGuesses(guesses string) {
 
 /*SetIncorrectGuesses set incorrect guesses*/
 func (word *GameWord) SetIncorrectGuesses(guesses string) {
-	if word.Length < 7 {
+	if word.Length < maxIncorrectGuesses {
 		word.incorrectGuesses = make([]string, word.Length, word.Length)
 	} else {
-		word.incorrectGuesses = make([]string, 7, 7)
+		word.incorrectGuesses = make([]string, maxIncorrectGuesses, maxIncorrectGuesses)
 	}
 	for i,v := range strings.Split(guesses, ",") {
 		word.incorrectGuesses[i] = v

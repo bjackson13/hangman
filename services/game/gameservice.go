@@ -4,6 +4,7 @@ import (
 	"github.com/bjackson13/hangman/models/game"
 	"github.com/bjackson13/hangman/models/words"
 	"errors"
+	"strings"
 )
 
 /*Service struct to bind our service functions to*/
@@ -24,6 +25,7 @@ func NewService() *Service {
 /*GetUserGame get the game a user is currently in. Nil if none*/
 func (s *Service) GetUserGame(userID int) *games.Game {
 	gameRepo, err := games.NewRepo()
+	defer gameRepo.Close()
 	if err != nil {
 		return nil
 	}
@@ -47,9 +49,10 @@ func (s *Service) EndGame(gameID int) error {
 	 
 }
 
-/*CheckGuesses see if game has a guess*/
-func (s *Service) CheckGuesses(gameID, userID int) (string,error) {
+/*CheckPendingGuesses see if game has a guess*/
+func (s *Service) CheckPendingGuesses(gameID, userID int) (string,error) {
 	gameRepo, err := games.NewRepo()
+	defer gameRepo.Close()
 	if err != nil {
 		return "", err
 	}
@@ -64,49 +67,54 @@ func (s *Service) CheckGuesses(gameID, userID int) (string,error) {
 }
 
 /*MakeGuess submit a guess*/
-func (s *Service) MakeGuess(gameID, userID, wordID int, guess string) error {
-	guessChan := make(chan bool)
+func (s *Service) MakeGuess(gameID, userID, wordID int, guess string) GuessResult {
+	wordChan := make(chan *words.GameWord)
 	go func() {
 		wordsRepo, err := words.NewRepo()
 		defer wordsRepo.Close()
 		word, err := wordsRepo.GetWord(wordID)
 		if err != nil {
-			guessChan <- true // use true to skip adding guess if we  can't check
+			wordChan <- nil 
 			return
 		} 
-		guessChan <- word.GuessAlreadyMade(guess)
+		wordChan <- word
 	}()
-	
-	guessMadePreviously := <- guessChan
 
 	/*We save time (not resources unfortunatley) by making checks now and creating repos in case they are needed*/
 	gameRepo, err := games.NewRepo()
+	defer gameRepo.Close()
 	if err != nil {
-		return err
+		return GuessResult{false, false, err}
 	}
 	
 	if len(guess) <= 0 {
-		return errors.New("No guess")
+		return GuessResult{false, false, errors.New("No guess")}
 	}
 
 	/*
 		strip guess to just first character.
 		we convert to rune array first so the string is utf-8 encoded
 	*/
-	guess = string([]rune(guess)[0])
+	guess = strings.ToUpper(string([]rune(guess)[0]))
 
-	if !guessMadePreviously {
-		return gameRepo.AddGuess(guess, gameID, userID)
-
+	word := <- wordChan
+	if !word.GuessAlreadyMade(guess) {
+		return GuessResult {
+				word.IsCompleted(), 
+				word.GuessLimitExceeded(), 
+				gameRepo.AddGuess(guess, gameID, userID),
+			}
 	}
 
-	return errors.New("Guess already made")
+	return GuessResult{false, false, errors.New("Guess already made")}
 }
 
 /*DenyGuess deny a guess*/
 func (s *Service) DenyGuess(game games.Game) GuessResult {
 	gameRepo, err := games.NewRepo()
+	defer gameRepo.Close()
 	wordsRepo, err := words.NewRepo()
+	defer wordsRepo.Close()
 	if err != nil {
 		return GuessResult{false, false, err}
 	}
@@ -118,7 +126,11 @@ func (s *Service) DenyGuess(game games.Game) GuessResult {
 			guessChan <- GuessResult{false, false, wErr}
 		}
 		word.AddIncorrectGuess(game.PendingGuess)
-		guessChan <- GuessResult{word.IsCompleted(), word.GuessLimitExceeded(), wordsRepo.UpdateWordGuesses(*word)}
+		guessChan <- GuessResult {
+						word.IsCompleted(), 
+						word.GuessLimitExceeded(), 
+						wordsRepo.UpdateWordGuesses(*word),
+					}
 	}()
 
 	go func() {
@@ -137,7 +149,9 @@ func (s *Service) AddWord(gameID, wordLength int) error {
 	} 
 
 	gameRepo, err := games.NewRepo()
+	defer gameRepo.Close()
 	wordsRepo, err := words.NewRepo()
+	defer wordsRepo.Close()
 	if err != nil {
 		return err
 	}
@@ -148,4 +162,19 @@ func (s *Service) AddWord(gameID, wordLength int) error {
 	}
 	
 	return gameRepo.UpdateWord(gameID, wordID)
+}
+
+/*GetIncorrectGuesses return incorrect guesses for the game word*/
+func (s *Service) GetIncorrectGuesses(wordID int) ([]string, error) {
+	wordsRepo, err := words.NewRepo()
+	defer wordsRepo.Close()
+	if err != nil {
+		return []string{},err
+	}
+
+	word, err := wordsRepo.GetWord(wordID)
+	if err != nil {
+		return []string{},err
+	}
+	return word.GetIncorrectGuesses(),nil
 }

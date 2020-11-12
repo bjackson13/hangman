@@ -72,7 +72,7 @@ func (repo *Repo) UpdateWordGuesses(word GameWord) error {
 		return err
 	}
 
-	_, err = wordStmt.Exec(word.GetCorrectGuesses(), word.GetIncorrectGuesses(), &word.WordID)
+	_, err = wordStmt.Exec(word.CorrectToString(), word.IncorrectToString(), &word.WordID)
 	return err
 }
 
