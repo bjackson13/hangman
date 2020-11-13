@@ -125,7 +125,7 @@ func (repo *Repo) RemoveGuess(gameID int) error {
 
 /*SwapUsers make the guessing user the word creator and the word creator the guessing user*/
 func (repo *Repo) SwapUsers(gameID int) error {
-	gameStmt, err := repo.DB.Prepare("UPDATE Games SET GuessingUserId = (@tmp:=GuessingUserId), GuessingUserId = WordCreatorId, WordCreatorId = @tmp, PendingGuess = NULL WHERE GameId = ?")
+	gameStmt, err := repo.DB.Prepare("UPDATE Games SET GuessingUserId = (@tmp:=GuessingUserId), GuessingUserId = WordCreatorId, WordCreatorId = @tmp, WordId = NULL, PendingGuess = NULL WHERE GameId = ?")
 	defer gameStmt.Close()
 	if err != nil {
 		return err

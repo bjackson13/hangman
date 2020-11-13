@@ -49,6 +49,17 @@ func (s *Service) EndGame(gameID int) error {
 	 
 }
 
+/*RestartGame swap user roles and restart game*/
+func (s *Service) RestartGame(gameID int) error {
+	gameRepo, err := games.NewRepo()
+	defer gameRepo.Close()
+	if err != nil {
+		return nil
+	}
+
+	return gameRepo.SwapUsers(gameID)
+}
+
 /*CheckPendingGuesses see if game has a guess*/
 func (s *Service) CheckPendingGuesses(gameID, userID int) (string,error) {
 	gameRepo, err := games.NewRepo()
@@ -177,4 +188,32 @@ func (s *Service) GetIncorrectGuesses(wordID int) ([]string, error) {
 		return []string{},err
 	}
 	return word.GetIncorrectGuesses(),nil
+}
+
+/*GetGameStatus check if game end conditions have been met*/
+func (s *Service) GetGameStatus(wordID int) GuessResult {
+	wordsRepo, err := words.NewRepo()
+	defer wordsRepo.Close()
+	if err != nil {
+		return GuessResult{false, false, err}
+	}
+
+	word, err := wordsRepo.GetWord(wordID)
+	if err != nil {
+		return GuessResult{false, false, err}
+	}
+
+	completedChan := make(chan bool)
+	exceededChan := make (chan bool)
+
+	/*Run these checks in parallel*/
+	go func() {
+		completedChan <- word.IsCompleted()
+	}()
+
+	go func() {
+		exceededChan <- word.GuessLimitExceeded()
+	}()
+
+	return GuessResult{ <- completedChan, <- exceededChan , nil}
 }

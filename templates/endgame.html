@@ -1,0 +1,41 @@
+{{block "end_game" .}}
+<div class="modal" tabindex="-1" role="dialog" id="endgame-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">The game has ended!</h5>
+      </div>
+      <div class="modal-body">
+        {{if .guesserWon}} 
+            <p>The word has been guessed! Pick a better word next time!</p>
+        {{else if .creatorWon}}
+            <p>Seems that the word was too challenging for the guesser!</p>
+        {{end}}
+
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-success" href="/game/restart" role="button">Play Again</a>
+        <a class="btn btn-danger" href="/game/end" role="button">Quit</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    endGame();
+
+    function checkEndOrRestart() {
+        $.ajax({
+        url: `/game/status/restarted`, type: "GET", 
+        success: function (result) {
+            if (result.restarted) {
+                window.location.href = "/game/"
+            } else if (result.exited) {
+                window.location.href = "/lobby/"
+            }
+        }
+    });   
+    }
+
+    setInterval(checkEndOrRestart, 3000);
+</script>
+{{end}}

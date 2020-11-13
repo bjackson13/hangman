@@ -19,6 +19,10 @@ func RegisterGameRoutes(router *gin.Engine) {
 		gameGroup.GET("/guess/deny", denyGuess)
 		gameGroup.GET("/guess/incorrect", getIncorrectGuesses)
 		gameGroup.POST("/word/create", createWord)
+		gameGroup.GET("/status", checkEndGame)
+		gameGroup.GET("/status/restarted", restartOrEnd)
+		gameGroup.GET("/restart", restartGame)
+		gameGroup.GET("/end", endGame)
 	}
 }
 
@@ -172,5 +176,84 @@ func getIncorrectGuesses(c *gin.Context) {
 	/*If user is not in game or is not the guessing user*/
 	c.JSON(http.StatusInternalServerError, gin.H{
 		"error":	"Could not get guesses, please try again",
+	})
+}
+
+func checkEndGame(c *gin.Context) {
+	authedUser := c.MustGet("authorized-user").(*user.User)
+	gameService := games.NewService()
+
+	/*If we have a valid game*/
+	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
+		if game.WordID == -1 {
+			c.JSON(http.StatusOK, gin.H{
+				"error":	"Please wait for word creator to pick word",
+			})
+			return
+		}
+		result := gameService.GetGameStatus(game.WordID)
+		if result.Error == nil {
+			if result.WordComplete || result.LimitExceeded {
+				c.HTML(http.StatusOK, "end_game", gin.H{
+					"guesserWon":	result.WordComplete,
+					"creatorWon": 	result.LimitExceeded,
+				})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{
+				"status":	"Word has not been guessed yet or limit exceeded",
+			})
+			return
+		}
+	}
+	/*If user is not in game or is not the guessing user*/
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"error":	"Could not get game status, please try again",
+	})
+}
+
+func restartGame(c *gin.Context) {
+	gameService := games.NewService()
+	authedUser := c.MustGet("authorized-user").(*user.User)
+	
+	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
+		_ = gameService.RestartGame(game.GameID)
+		c.Redirect(http.StatusFound, "/")
+	} else {
+		//redirect 
+		c.Redirect(http.StatusFound, "/lobby")
+	}
+	
+}
+
+func endGame(c *gin.Context) {
+	gameService := games.NewService()
+	authedUser := c.MustGet("authorized-user").(*user.User)
+	
+	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
+		_ = gameService.EndGame(game.GameID)
+	}
+	//redirect 
+	c.Redirect(http.StatusFound, "/lobby")
+}
+
+func restartOrEnd(c *gin.Context) {
+	gameService := games.NewService()
+	authedUser := c.MustGet("authorized-user").(*user.User)
+	
+	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
+		if game.WordID == -1 {
+			c.JSON(http.StatusOK, gin.H{
+				"restarted":	"Time for round 2 (or 3?)",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"current":	"Game still ongoing",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"exited":	"Game over man",
 	})
 }
