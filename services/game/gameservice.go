@@ -187,7 +187,17 @@ func (s *Service) GetIncorrectGuesses(wordID int) ([]string, error) {
 	if err != nil {
 		return []string{},err
 	}
-	return word.GetIncorrectGuesses(),nil
+
+	guesses := word.GetIncorrectGuesses()
+	var index int
+	for i,v := range guesses {
+		if v == "" {
+			index = i
+			break
+		}
+	}
+
+	return guesses[:index],nil
 }
 
 /*GetGameStatus check if game end conditions have been met*/

@@ -38,25 +38,35 @@ function drawHangman(count) {
 
     let gallow = `
         <g>
-            <line y1="250" x1="75" y2="250" x2="225" stroke-width="3" stroke="#000" />
-            <line  y1="35" x1="100" y2="250" x2="100" stroke-width="3" stroke="#000" />
+            <line  y1="280" x1="75" y2="280" x2="225" stroke-width="3" stroke="#000" />
+            <line  y1="35" x1="100" y2="280" x2="100" stroke-width="3" stroke="#000" />
             <line  y1="35" x1="100" y2="35" x2="200" stroke-width="3" stroke="#000" />
-            <line  y1="35" x1="200" y2="85" x2="200"  stroke-width="3" stroke="#000" />
+            <line  y1="35" x1="200" y2="70" x2="200"  stroke-width="3" stroke="#000" />
         </g>`;
 
     let head = `
-    
+            <circle cx="200" cy="95" r="25" stroke="black" stroke-width="3" fill="black" /> 
+        `;
+
+    let body = `
+            <line  y1="120" x1="200" y2="215" x2="200" stroke-width="3" stroke="#000" />
+        `;
+
+    let lArm = `
+            <line  y1="140" x1="200" y2="185" x2="170" stroke-width="3" stroke="#000" />
     `;
 
-    let body = ``;
+    let rArm = `
+            <line  y1="140" x1="200" y2="185" x2="230" stroke-width="3" stroke="#000" />
+    `;
 
-    let lArm = ``;
+    let lLeg = `
+            <line  y1="215" x1="200" y2="255" x2="170" stroke-width="3" stroke="#000" />
+    `;
 
-    let rArm = ``;
-
-    let lLeg = ``;
-
-    let rLeg = ``;
+    let rLeg = `
+            <line  y1="215" x1="200" y2="255" x2="230" stroke-width="3" stroke="#000" />
+    `;
 
     let svgArr = [gallow, head, body, lArm, rArm, lLeg, rLeg];
     
