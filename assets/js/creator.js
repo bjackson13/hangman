@@ -17,12 +17,11 @@ setInterval(checkGuess, 6000)
 
 function denyGuess() {
     $.ajax({
-        url: `/game/guess/deny`, type: "GET", success: function (result) {
-            console.log(result)
+        url: `/game/guess/deny`, type: "GET", 
+        success: function (result) {
             $("#pending-guess-container").remove();
         },
         error: function(result) {
-            console.log(result)
             let html = `
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 ${result.error}
@@ -34,6 +33,29 @@ function denyGuess() {
           $("#pending-guess-container").prepend(html);
         }
     });    
+}
+
+function acceptGuess() {
+    let indexes = [];
+
+    $.ajax({
+        url: `/game/guess/accept`, type: "POST", data: {indexes: indexes},
+        success: function (result) {
+            $("#pending-guess-container").remove();
+        },
+        error: function(result) {
+            let html = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                ${result.error}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+          `
+          $("#pending-guess-container").prepend(html);
+        }
+    });  
+
 }
 
 function submitWord() {

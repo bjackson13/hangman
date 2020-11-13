@@ -5,6 +5,7 @@ import (
 	"github.com/bjackson13/hangman/models/words"
 	"errors"
 	"strings"
+	"strconv"
 )
 
 /*Service struct to bind our service functions to*/
@@ -71,7 +72,7 @@ func (s *Service) CheckPendingGuesses(gameID, userID int) (string,error) {
 	guess, err := gameRepo.GetGuess(gameID, userID) 
 
 	if guess == "" {
-		return "", errors.New("No Guess")
+		return "", errors.New("No Guess") //use an error to signal if we have a guess or not
 	}
 
 	return guess, err
@@ -124,6 +125,9 @@ func (s *Service) MakeGuess(gameID, userID, wordID int, guess string) GuessResul
 func (s *Service) DenyGuess(game games.Game) GuessResult {
 	gameRepo, err := games.NewRepo()
 	defer gameRepo.Close()
+	if err != nil {
+		return GuessResult{false, false, err}
+	}
 	wordsRepo, err := words.NewRepo()
 	defer wordsRepo.Close()
 	if err != nil {
@@ -150,6 +154,46 @@ func (s *Service) DenyGuess(game games.Game) GuessResult {
 
 	return <- guessChan
 
+}
+
+/*AcceptGuess accept a guess and place the letter in the proper indexes. Indexes needs to be 0-based*/
+func (s *Service) AcceptGuess(game games.Game, indexes []string) error {
+	/*MAke the necessary repos*/
+	gameRepo, err := games.NewRepo()
+	defer gameRepo.Close()
+	if err != nil {
+		return err
+	}
+	wordsRepo, err := words.NewRepo()
+	defer wordsRepo.Close()
+	if err != nil {
+		return err
+	}
+
+	//convert indexes strings to ints
+	var idx = []int{}
+	for _,v := range indexes {
+		num,_ := strconv.Atoi(v)
+		idx = append(idx, num)
+	}
+
+	//go submit the guess
+	errChan := make(chan error)
+	go func() {
+		word, wErr := wordsRepo.GetWord(game.WordID)
+		if wErr != nil {
+			errChan <- err
+		}
+		word.AddCorrectGuess(game.PendingGuess, idx)
+		errChan <- wordsRepo.UpdateWordGuesses(*word)
+	}()
+
+	//at the same time remove our pending guess
+	go func() {
+		gameRepo.RemoveGuess(game.GameID)
+	}()
+
+	return <- errChan //return result of accepting guess
 }
 
 /*AddWord add the new game word*/

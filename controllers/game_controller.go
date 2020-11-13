@@ -17,6 +17,7 @@ func RegisterGameRoutes(router *gin.Engine) {
 		gameGroup.POST("/makeGuess", makeGuess)
 		gameGroup.GET("/guess", checkPendingGuess)
 		gameGroup.GET("/guess/deny", denyGuess)
+		gameGroup.GET("/guess/accept", acceptGuess)
 		gameGroup.GET("/guess/incorrect", getIncorrectGuesses)
 		gameGroup.POST("/word/create", createWord)
 		gameGroup.GET("/status", checkEndGame)
@@ -121,7 +122,6 @@ func denyGuess(c *gin.Context) {
 		if result.Error == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success":	"Guess denied/removed",
-				"guessesExceeded": result.LimitExceeded,
 			})
 			return
 		}
@@ -129,6 +129,26 @@ func denyGuess(c *gin.Context) {
 	/*If user is not in game or is not the guessing user*/
 	c.JSON(http.StatusInternalServerError, gin.H{
 		"error":	"Could not deny guess, please try again",
+	})
+}
+
+func acceptGuess(c *gin.Context) {
+	authedUser := c.MustGet("authorized-user").(*user.User)
+	gameService := games.NewService()
+
+	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
+		indexes := c.PostFormArray("indexes")
+		result := gameService.AcceptGuess(*game, indexes)
+		if result.Error == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success":	"Guess accepted",
+			})
+			return
+		}
+	}
+	
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"error":	"Could not accept guess, please try again",
 	})
 }
 

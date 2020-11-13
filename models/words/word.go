@@ -12,7 +12,8 @@ type GameWord struct {
 	incorrectGuesses []string
 }
 
-var maxIncorrectGuesses = 7
+//max number of guesses - life saver when playing test games
+var maxIncorrectGuesses = 3
 
 /*AddCorrectGuess add a correct guess to our word. Takes the letter to be added and the indexes to set as correct*/
 func (word *GameWord) AddCorrectGuess(letter string, indexes []int) {
@@ -65,11 +66,7 @@ func (word *GameWord) SetCorrectGuesses(guesses string) {
 
 /*SetIncorrectGuesses set incorrect guesses*/
 func (word *GameWord) SetIncorrectGuesses(guesses string) {
-	if word.Length < maxIncorrectGuesses {
-		word.incorrectGuesses = make([]string, word.Length, word.Length)
-	} else {
-		word.incorrectGuesses = make([]string, maxIncorrectGuesses, maxIncorrectGuesses)
-	}
+	word.incorrectGuesses = make([]string, maxIncorrectGuesses, maxIncorrectGuesses)
 	for i,v := range strings.Split(guesses, ",") {
 		word.incorrectGuesses[i] = v
 	}
@@ -98,6 +95,7 @@ func (word *GameWord) GuessLimitExceeded() bool {
 /*GuessAlreadyMade check if guess was already made*/
 func (word *GameWord) GuessAlreadyMade(guess string) bool {
 	check := make(chan bool, 2)
+	//see if guess is in correct guesses
 	go func() {
 		found := false
 		for _,v := range word.correctGuesses {
@@ -109,6 +107,7 @@ func (word *GameWord) GuessAlreadyMade(guess string) bool {
 		check <- found
 	}()
 
+	//see if incorrect guesses
 	go func() {
 		found := false
 		for _,v := range word.incorrectGuesses {
@@ -119,7 +118,7 @@ func (word *GameWord) GuessAlreadyMade(guess string) bool {
 		}
 		check <- found
 	}()
-	
+	//wait for both to finish
 	found1 := <- check 
 	found2 := <- check
 
