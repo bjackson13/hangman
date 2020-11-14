@@ -1,18 +1,17 @@
 {{block "guesses" .}}
 <label style="display: block;">Incorrect Guess: </label>
 <svg id="incorrect-guesses" {{if .incorrect}} data-guessCount="{{len .incorrect}}" {{end}} class="mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
-    baseProfile="full" width="100%" height="50%">
+    baseProfile="full" width="100%" height="30%">
     {{if .incorrect}}
     <text x="40" y="20" font-size="20" text-anchor="middle" stroke="black" stroke-width="1"
         fill="black">{{range .incorrect}} {{.}} {{end}}</text>
     {{end}}
 </svg>
-<br />
-<svg id="correct-guesses" class="mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
-    baseProfile="full" width="100%" height="50%">
-    {{if .correct}}
+<label style="display: block;">Correct Guess: </label>
+<svg id="correct-guesses" class="mx-auto" data-wordLength="{{.wordLength}}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+    baseProfile="full" width="100%" height="30%">
+    
     <text x="40" y="20" font-size="20" text-anchor="middle" stroke="black" stroke-width="1"
-        fill="black">{{range .correct}} {{.}} {{end}}</text>
-    {{end}}
+        fill="black">{{range .correct}} {{if ne . ""}} {{.}} {{else}} ? {{end}}{{end}}</text>
 </svg>
 {{end}}

@@ -38,14 +38,7 @@ func (word *GameWord) AddIncorrectGuess(letter string) {
 
 /*GetCorrectGuesses return correct guesses in CSV format*/
 func (word *GameWord) GetCorrectGuesses() []string {
-	var index int
-	for i,v := range word.correctGuesses {
-		if v == "" {
-			index = i
-			break
-		}
-	}
-	return word.correctGuesses[:index]
+	return word.correctGuesses
 }
 
 /*GetIncorrectGuesses return incorrect guesses in CSV format*/
