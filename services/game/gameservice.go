@@ -219,29 +219,30 @@ func (s *Service) AddWord(gameID, wordLength int) error {
 	return gameRepo.UpdateWord(gameID, wordID)
 }
 
-/*GetIncorrectGuesses return incorrect guesses for the game word*/
-func (s *Service) GetIncorrectGuesses(wordID int) ([]string, error) {
+/*GetGuesses return incorrect guesses for the game word*/
+func (s *Service) GetGuesses(wordID int) ([]string, []string, error) {
 	wordsRepo, err := words.NewRepo()
 	defer wordsRepo.Close()
 	if err != nil {
-		return []string{},err
+		return []string{},[]string{},err
 	}
 
 	word, err := wordsRepo.GetWord(wordID)
 	if err != nil {
-		return []string{},err
+		return []string{},[]string{},err
 	}
 
-	guesses := word.GetIncorrectGuesses()
-	var index int
-	for i,v := range guesses {
-		if v == "" {
-			index = i
-			break
-		}
+	/*This is totally unessesary but I wanted to try out anonymous structs */
+	guesses := struct {
+		Correct []string
+		Incorrect []string
+	}{
+		Correct: word.GetCorrectGuesses(), 
+		Incorrect: word.GetIncorrectGuesses(),
 	}
+	
 
-	return guesses[:index],nil
+	return guesses.Correct, guesses.Incorrect, nil
 }
 
 /*GetGameStatus check if game end conditions have been met*/

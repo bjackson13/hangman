@@ -18,7 +18,7 @@ func RegisterGameRoutes(router *gin.Engine) {
 		gameGroup.GET("/guess", checkPendingGuess)
 		gameGroup.GET("/guess/deny", denyGuess)
 		gameGroup.GET("/guess/accept", acceptGuess)
-		gameGroup.GET("/guess/incorrect", getIncorrectGuesses)
+		gameGroup.GET("/guess/all", getGuesses)
 		gameGroup.POST("/word/create", createWord)
 		gameGroup.GET("/status", checkEndGame)
 		gameGroup.GET("/status/restarted", restartOrEnd)
@@ -173,7 +173,9 @@ func createWord(c *gin.Context) {
 	})
 }
 
-func getIncorrectGuesses(c *gin.Context) {
+
+//TODO: Change this to get Guesses and return both correct incorrect. Need to change template and template name, controller, and front end checks
+func getGuesses(c *gin.Context) {
 	authedUser := c.MustGet("authorized-user").(*user.User)
 	gameService := games.NewService()
 
@@ -185,10 +187,11 @@ func getIncorrectGuesses(c *gin.Context) {
 			})
 			return
 		}
-		guesses, err := gameService.GetIncorrectGuesses(game.WordID)
+		correct, incorrect, err := gameService.GetGuesses(game.WordID)
 		if err == nil {
-			c.HTML(http.StatusOK, "incorrect_guesses", gin.H{
-				"incorrect":	guesses,
+			c.HTML(http.StatusOK, "guesses", gin.H{
+				"incorrect":	incorrect,
+				"correct": 		correct,
 			})
 			return
 		}

@@ -1,6 +1,6 @@
-function checkIncorrectGuesses() {
+function checkGuesses() {
     $.ajax({
-        url: `/game/guess/incorrect`, type: "GET", 
+        url: `/game/guess/all`, type: "GET", 
         success: function (result) {
             if(!result.responseJSON) {
                 $("#guess-container").html(result);
@@ -15,7 +15,7 @@ function checkIncorrectGuesses() {
     });   
 }
 
-var checkIncorrectID = setInterval(checkIncorrectGuesses, 5000);
+var checkGuessesID = setInterval(checkGuesses, 5000);
 
 function checkGameStatus() {
     $.ajax({
@@ -79,6 +79,6 @@ function drawHangman(count) {
 }
 
 function endGame() {
-    clearInterval(checkIncorrectID);
+    clearInterval(checkGuessesID);
     clearInterval(checkStatusID);
 }
