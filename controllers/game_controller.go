@@ -6,6 +6,7 @@ import (
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/services/game"
 	"strconv"
+	"fmt"
 )
 
 /*RegisterGameRoutes register game endpoints*/
@@ -17,7 +18,7 @@ func RegisterGameRoutes(router *gin.Engine) {
 		gameGroup.POST("/makeGuess", makeGuess)
 		gameGroup.GET("/guess", checkPendingGuess)
 		gameGroup.GET("/guess/deny", denyGuess)
-		gameGroup.GET("/guess/accept", acceptGuess)
+		gameGroup.POST("/guess/accept", acceptGuess)
 		gameGroup.GET("/guess/all", getGuesses)
 		gameGroup.POST("/word/create", createWord)
 		gameGroup.GET("/status", checkEndGame)
@@ -93,10 +94,26 @@ func checkPendingGuess(c *gin.Context) {
 
 	/*If we have a valid game*/
 	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
+		guessChan := make(chan []string)
+		if game.WordID != -1 {
+			go func() {
+				correct, _, err := gameService.GetGuesses(game.WordID)
+				if err != nil {
+					guessChan <- nil
+					return
+				}
+				guessChan <- correct
+			}()
+		} else {
+			guessChan <- nil
+		}
+		
 		guess, err := gameService.CheckPendingGuesses(game.GameID, authedUser.UserID)
-		if err == nil {
+		correctGuesses := <- guessChan
+		if err == nil && correctGuesses != nil {
 			c.HTML(http.StatusOK, "pending_guess", gin.H{
 				"guess":	guess,
+				"correctGuesses": correctGuesses,
 			})
 			return
 		}
@@ -137,9 +154,10 @@ func acceptGuess(c *gin.Context) {
 	gameService := games.NewService()
 
 	if game := gameService.GetUserGame(authedUser.UserID); game != nil {
-		indexes := c.PostFormArray("indexes")
-		result := gameService.AcceptGuess(*game, indexes)
-		if result.Error == nil {
+		indexes := c.PostFormArray("indexes[]")
+		fmt.Println(indexes)
+		err := gameService.AcceptGuess(*game, indexes)//indexes)
+		if err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success":	"Guess accepted",
 			})
