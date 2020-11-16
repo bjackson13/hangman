@@ -13,7 +13,7 @@ type GameWord struct {
 }
 
 //max number of guesses - life saver when playing test games
-var maxIncorrectGuesses = 3
+var maxIncorrectGuesses = 7
 
 /*AddCorrectGuess add a correct guess to our word. Takes the letter to be added and the indexes to set as correct*/
 func (word *GameWord) AddCorrectGuess(letter string, indexes []int) {
