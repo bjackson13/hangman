@@ -1,0 +1,27 @@
+{{block "pending_guess" .}}
+    <div id="pending-guess-container">
+        <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                version="1.1" baseProfile="full" width="50" height="50">
+
+                <text x="25" y="30" font-size="30" text-anchor="middle" stroke="black" stroke-width="1" fill="black">{{.guess}}</text>
+        </svg>
+        <div id="incorrect-guess-button" class="mt-1">
+            <button type="button" class="btn btn-danger" onclick="denyGuess()">Incorrect</button>
+        </div>
+        <div id="correct-guess-button" class="mt-1">
+            <label style="display: block;">Please click boxes letter should go in:</label>
+            <div>
+                <ol id="guess-boxes" class="list-inline">
+                    {{range $index,$val := .correctGuesses}}
+                    {{if ne $val ""}} 
+                    <li style="height: 25px; width: 25px; cursor: not-allowed; text-align: center;" class="index list-inline-item border border-secondary mw-25 mh-100 disabled .bg-light" data-index="{{$index}}">{{$val}}</li> 
+                    {{else}} 
+                    <li style="height: 25px; width: 25px; cursor: pointer; text-align: center;" class="index list-inline-item border border-secondary mw-25 mh-100" data-index="{{$index}}" onclick="selectIndex(this)">&#8203;</li> 
+                    {{end}}
+                    {{end}}
+                </ol>
+            </div>
+            <button type="button" class="btn btn-success" onclick="acceptGuess()">Correct</button>
+        </div>
+    </div>
+{{end}}

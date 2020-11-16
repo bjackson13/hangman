@@ -1,0 +1,28 @@
+{{block "word_creator" .}}
+<div class="col-3" id="guess-container">
+    <label>Pending Guess: </label>
+    <div id="pending-stage"></div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="word-creation-modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Please enter the length of your word:</h5>
+        </div>
+        <div class="modal-body">
+          <label for="word-length">Word Length(1-15 characters):</label>
+          <input type="number" name="word-length" id="word-length">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" onclick="submitWord()">Submit</button>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+    $(window).on('load',function(){
+        $("#word-creation-modal").modal("show");
+    });
+</script>
+<script src="/assets/js/creator.js"></script>
+{{end}}

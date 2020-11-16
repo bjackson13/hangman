@@ -1,0 +1,11 @@
+{{block "word_guesser" .}}
+<div class="col-3" id="keyboard-container">
+    <label for="keyboard">Guess a letter: </label>
+    <input id="keyboard" class="virtual-keyboard" maxlength="1" data-kioskboard-type="keyboard"
+        data-kioskboard-specialcharacters="false" placeholder="Guess" />
+    <button type="button" class="btn btn-primary mt-3" onclick="makeGuess()">Guess</button>
+</div>
+<script src="/assets/kioskboard/kioskboard-aio-1.3.3.min.js"></script>
+<script src="/assets/js/kioskboard.js"></script>
+<script src="/assets/js/guesser.js"></script>
+{{end}}

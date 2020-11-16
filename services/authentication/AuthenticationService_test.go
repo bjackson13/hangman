@@ -8,10 +8,10 @@ import (
 
 func TestAuthenticateUserLogin(t *testing.T) {
 	//test user in test DB
-	username := "auth"
-	password := "auth"
+	username := "bren"
+	password := "bren"
 
-	user, err := AuthenticateUserLogin(username, password)
+	user, err := AuthenticateUserLogin(username, password, "192.1.1.1", "chrome")
 	if err != nil {
 		t.Errorf("Failed to authenticate user: %s", err.Error())
 	}
@@ -25,7 +25,7 @@ func TestInvalidUserLoginNoUserNoPass(t *testing.T) {
 	username := ""
 	password := ""
 
-	user, err := AuthenticateUserLogin(username, password)
+	user, err := AuthenticateUserLogin(username, password, "", "")
 	if err == nil {
 		t.Errorf("Should have received error while logging in")
 	}
@@ -40,7 +40,7 @@ func TestInvalidUserLoginValidUserInvlaidPass(t *testing.T) {
 	username := "auth"
 	password := "thisisinvalid"
 
-	user, err := AuthenticateUserLogin(username, password)
+	user, err := AuthenticateUserLogin(username, password, "", "")
 	if err == nil {
 		t.Errorf("Should have received error while logging in")
 	}
@@ -67,7 +67,7 @@ func TestGenerateVerifyparseSessionToken(t *testing.T) {
 
 	parsedUser, err := parseSessionToken(token)
 	if parsedUser == nil || err != nil {
-		t.Errorf("invalid token could not be parsed")
+		t.Errorf("invalid token could not be parsed: %v", err.Error())
 	}
 
 	if parsedUser.Username != testUser.Username || parsedUser.IP != testUser.IP || parsedUser.UserAgent != testUser.UserAgent || parsedUser.UserID != testUser.UserID {

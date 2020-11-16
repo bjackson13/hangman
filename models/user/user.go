@@ -2,16 +2,16 @@ package user
 
 /*User - struct to load data into from USer table in DB*/
 type User struct {
-	UserID int
-	Username string
-	IP string
-	UserAgent string
-	LastLogin int64
+	UserID int `json:userid`
+	Username string `json:username`
+	IP string	`json:ip`
+	UserAgent string `json:useragent`
+	LastLogin int64 `json:lastlogin`
 	password string
 }
 
 /*NewUser - create and return a ference to a user struct with the provided attributes set*/
-func NewUser(username string, password string, ip string, useragent string, login int64) *User {
+func NewUser(username, password, ip, useragent string, login int64) *User {
 	user := new(User)
 	user.Username = username
 

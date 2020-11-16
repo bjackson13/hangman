@@ -1,13 +1,12 @@
 package user
 
 import (
-	"github.com/bjackson13/hangman/models"
 	"testing"
 	"os"
 	"time"
 )
 
-var conn *dbconn.DB
+var userRepo *Repo
 var insertedID int
 var lastLoginStamp int64
 
@@ -19,31 +18,28 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	db, err := dbconn.Connect()
+	var err error
+	userRepo, err = NewRepo()
 	if err != nil {
 		panic(err.Error())
 	}
-	conn = db
 }
 
 func teardown() {
-	err := conn.Connection.Close()
+	err := userRepo.Close()
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
 func TestNewRepo(t *testing.T) {
-	userRepo := NewRepo(conn)
-	err := userRepo.db.Connection.Ping()
+	err := userRepo.DB.Ping()
 	if err != nil {
 		t.Errorf("Failed to create UserRepo with Database connection! %s", err.Error())
 	}
 }
 
 func TestAddUser(t *testing.T) {
-	userRepo := NewRepo(conn)
-
 	lastLoginStamp = time.Now().Unix()
 	insertedUserID, err := userRepo.AddUser("test", "test", "192.168.1.1", "Mozilla...", lastLoginStamp)
 	if err != nil {
@@ -53,7 +49,6 @@ func TestAddUser(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	userRepo := NewRepo(conn)
 	user,err := userRepo.GetUser("test")
 	if err != nil{
 		t.Errorf("Error retrieving user: %s", err.Error())
@@ -64,7 +59,6 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	userRepo := NewRepo(conn)
 	user := NewUser("updated", "updated", "192.1.1.1", "Chrome", 0)
 	user.UserID = insertedID // update our insterted user
 
@@ -75,7 +69,6 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestUpdateUserIdentifiers(t *testing.T) {
-	userRepo := NewRepo(conn)
 	lastLoginStamp = time.Now().Unix()
 	updatedUserCount,err := userRepo.UpdateUserIdentifiers(insertedID, "169.1.1.1", "Testing", lastLoginStamp)
 	if err != nil || updatedUserCount == 0 {
@@ -84,8 +77,6 @@ func TestUpdateUserIdentifiers(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	userRepo := NewRepo(conn)
-
 	deleted, err := userRepo.DeleteUser(insertedID)
 	if err != nil || deleted == 0 {
 		t.Errorf("Error deleting user: %s", err.Error())
