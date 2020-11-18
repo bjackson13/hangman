@@ -6,6 +6,7 @@ function getNewMessages() {
         success: function (result) {
             if(!result.responseJSON) {
                 $("#messages").append(result);
+                $("#message-list-container").scrollTop($("#messages li").last().position().top + $('ul li').last().height());
                 LAST_UPDATED_CHAT = Math.floor(Date.now() / 1000);
             }
         },
@@ -39,8 +40,9 @@ function getAllMessages() {
         success: function (result) {
             if(!result.responseJSON) {
                 $("#messages").html(result);
+                $("#message-list-container").scrollTop($("#messages li").last().position().top + $('ul li').last().height());
                 LAST_UPDATED_CHAT = Math.floor(Date.now() / 1000);
-                setInterval(getNewMessages, 3000)
+                setInterval(getNewMessages, 2000)
             }
         },
         error: function(result) {
