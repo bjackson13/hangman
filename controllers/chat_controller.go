@@ -22,6 +22,7 @@ func RegisterChatRoutes(router *gin.Engine) {
 /*getAllMessages return all chat messages*/
 func getAllMessages(c *gin.Context) {
 	chatID := c.MustGet("chatID").(int)
+	authedUser := c.MustGet("authorized-user").(*user.User)
 	chatService := chat.NewService()
 
 	userChat, err := chatService.GetAllMessages(chatID)
@@ -32,13 +33,16 @@ func getAllMessages(c *gin.Context) {
 		return
 	}
 
+	userChat.SortMessages()
 	c.HTML(http.StatusOK, "chat_messages", gin.H {
 		"messages": userChat.Messages,
+		"username": authedUser.Username,
 	})	
 }
 
 func getMessagesSince(c *gin.Context) {
 	chatID := c.MustGet("chatID").(int)
+	authedUser := c.MustGet("authorized-user").(*user.User)
 	chatService := chat.NewService()
 
 	timestamp := c.Param("time")
@@ -50,8 +54,10 @@ func getMessagesSince(c *gin.Context) {
 		return
 	}
 
+	
 	c.HTML(http.StatusOK, "chat_messages", gin.H {
 		"messages": userChat.Messages,
+		"username": authedUser.Username,
 	})	
 }
 

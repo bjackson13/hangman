@@ -22,7 +22,7 @@ func NewChat(chatID int, messages []Message) *Chat {
 	if len(messages) > 0 {
 		chat.Messages = messages
 	} else {
-		chat.Messages = make([]Message, 10) //default length of messages to 10
+		chat.Messages = make([]Message, 1) //default length of messages to 1
 	}
 
 	return chat
@@ -36,10 +36,9 @@ func (chat *Chat) AddMessage(message Message, wg *sync.WaitGroup) {
 }
 
 /*SortMessages sort messages in a chat by timestamp*/
-func (chat *Chat) SortMessages(wg *sync.WaitGroup) {
+func (chat *Chat) SortMessages() {
 	/*Keep messages sorted by time stamp*/
 	sort.Slice(chat.Messages, func(p, q int) bool {
 		return chat.Messages[p].Timestamp < chat.Messages[q].Timestamp
 	})
-	wg.Done()
 }

@@ -5,7 +5,7 @@
   {{template "nav" .}}
   <main role="main" class="container">
     <div class="container">
-      <div id="card-container" class="row mb-3">
+      <div id="card-container" class="row mb-3" style="overflow: auto;">
         {{template "user_cards" .}}
       </div>
 
@@ -13,6 +13,7 @@
     </div>
   </main><!-- /.container -->
   <script src="/assets/js/lobby.js"></script>
+  <script src="/assets/js/chat.js"></script>
   <div id="modal-container"></div>
 </body>
 
