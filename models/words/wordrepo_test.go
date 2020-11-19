@@ -3,6 +3,7 @@ package words
 import (
 	"os"
 	"testing"
+	"github.com/bjackson13/hangman/services/config"
 )
 
 var wordRepo *Repo
@@ -17,6 +18,11 @@ func TestMain(m *testing.M) {
 
 func setup() {
 	var err error
+	err = config.LoadEnvVariables()
+	if err != nil{
+		panic("Failed to load env variables")
+	}
+	
 	wordRepo, err = NewRepo()
 	if err != nil {
 		panic(err.Error())
@@ -61,7 +67,7 @@ func TestGetWord(t *testing.T) {
 		t.Errorf("Error getting word from DB, %s", err.Error())
 	}
 
-	if word.Length != 4 || word.CorrectToString() != "t,,,t" || word.IncorrectToString() != "q,r,," {
+	if word.Length != 4 || word.CorrectToString() != "t,,,t" || word.IncorrectToString() != "q,r,,,,," {
 		t.Errorf("Correct values not retireved from DB, %v %s %s", word.Length, word.CorrectToString(), word.IncorrectToString())
 	}
 }
@@ -78,7 +84,7 @@ func TestUpdateword(t *testing.T) {
 		t.Errorf("Error getting updated word from DB, %s", err.Error())
 	}
 	
-	if word.Length != 5 || word.CorrectToString() != ",,,," || word.IncorrectToString() != ",,,," {
+	if word.Length != 5 || len(word.GetCorrectGuesses()) != 5 {
 		t.Errorf("Correct values not retireved from DB: %v", word)
 	}
 }
