@@ -1,3 +1,6 @@
+create database btj9560;
+use btj9560;
+
 -- MySQL dump 10.13  Distrib 8.0.22, for Linux (x86_64)
 --
 -- Host: localhost    Database: btj9560
