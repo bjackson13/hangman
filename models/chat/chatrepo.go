@@ -25,7 +25,7 @@ func NewRepo() (*Repo, error) {
 /*GetAllMessages - get all messages from the database for a given chat*/
 func (repo *Repo) GetAllMessages(chatID int) (*Chat, error) {
 	chat := NewChat(chatID, nil)
-	msgStmt, err := repo.DB.Prepare("SELECT ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages WHERE ChatId = ?")
+	msgStmt, err := repo.DB.Prepare("SELECT ChatId, MessageId, Timestamp, User.Username, MessageText FROM Messages JOIN User ON Messages.SenderId = User.UserId WHERE ChatId = ?")
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (repo *Repo) GetAllMessages(chatID int) (*Chat, error) {
 	rows, err := msgStmt.Query(chatID)
 	for rows.Next() {
 		msg := Message{}
-		err = rows.Scan(&msg.ChatID, &msg.MessageID, &msg.Timestamp, &msg.SenderID, &msg.Text)
+		err = rows.Scan(&msg.ChatID, &msg.MessageID, &msg.Timestamp, &msg.Sender, &msg.Text)
 		if err != nil {
 			break;
 		}
@@ -50,7 +50,7 @@ func (repo *Repo) GetAllMessages(chatID int) (*Chat, error) {
 /*GetMessagesSince - get all messages from the database for a given chat*/
 func (repo *Repo) GetMessagesSince(timestamp int64, chatID int) (*Chat, error) {
 	chat := NewChat(chatID, nil)
-	msgStmt, err := repo.DB.Prepare("SELECT ChatId, MessageId, Timestamp, SenderId, MessageText FROM Messages WHERE ChatId = ? AND Timestamp >= ?")
+	msgStmt, err := repo.DB.Prepare("SELECT ChatId, MessageId, Timestamp, User.Username, MessageText FROM Messages JOIN User ON Messages.SenderId = User.UserId WHERE ChatId = ? AND Timestamp >= ?")
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (repo *Repo) GetMessagesSince(timestamp int64, chatID int) (*Chat, error) {
 
 	for rows.Next() {
 		msg := Message{}
-		err = rows.Scan(&msg.ChatID, &msg.MessageID, &msg.Timestamp, &msg.SenderID, &msg.Text)
+		err = rows.Scan(&msg.ChatID, &msg.MessageID, &msg.Timestamp, &msg.Sender, &msg.Text)
 		if err != nil {
 			break;
 		}

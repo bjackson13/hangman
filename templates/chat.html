@@ -1,4 +1,26 @@
 {{block "chat" .}}
-<div class="container" id="chat-container">
+<div class="fixed-bottom row" style="height: 35%;" id="chat-container">
+
+    <div class="col-3">
+    </div>
+    <div class="col-6 border mb-3">
+        <div class="row h-75 mh-75 border border-dark" id="chat-box">
+            <div id="message-list-container" class="w-100 mh-100 position-relative" style="overflow: auto;">
+                <ul id="messages" class="list-group bg-light mh-100 w-100 position-absolute">
+                </ul>
+            </div>
+        </div>
+        <div class="row h-25">
+            <div class="col-9 p-0">
+                <textarea id="message-box" class="border border-dark h-100 w-100" style="resize: none;" placeholder="Send a message..."></textarea>
+            </div>
+            <div class="col-3 p-0">
+                <button class="btn btn-success mx-auto w-100 h-100 rounded-0 border border-dark" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+    </div>
+
 </div>
 {{end}}

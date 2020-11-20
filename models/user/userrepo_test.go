@@ -4,6 +4,7 @@ import (
 	"testing"
 	"os"
 	"time"
+	"github.com/bjackson13/hangman/services/config"
 )
 
 var userRepo *Repo
@@ -19,6 +20,11 @@ func TestMain(m *testing.M) {
 
 func setup() {
 	var err error
+	err = config.LoadEnvVariables()
+	if err != nil{
+		panic("Failed to load env variables")
+	}
+	
 	userRepo, err = NewRepo()
 	if err != nil {
 		panic(err.Error())

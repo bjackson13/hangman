@@ -1,3 +1,12 @@
 {{block "chat_messages" .}}
-
+    {{$sender := .username}}
+    {{range .messages}}
+        {{if ne .Text ""}}
+            {{if eq .Sender $sender}}
+                <li class="list-group-item"><p class="text-left"><span class="text-success">{{.Sender}}:</span> {{.Text}}</p></li>
+            {{else}}
+                <li class="list-group-item"><p class="text-right">{{.Text}} <span class="text-danger">:{{.Sender}}</span></p></li>
+            {{end}}
+        {{end}}
+    {{end}}
 {{end}}

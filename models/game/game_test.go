@@ -3,6 +3,7 @@ package games
 import (
 	"testing"
 	"os"
+	"github.com/bjackson13/hangman/services/config"
 )
 
 var gameRepo *Repo
@@ -20,6 +21,11 @@ func TestMain(m *testing.M) {
 
 func setup() {
 	var err error
+	err = config.LoadEnvVariables()
+	if err != nil{
+		panic("Failed to load env variables")
+	}
+	
 	gameRepo, err = NewRepo()
 	if err != nil {
 		panic(err.Error())
@@ -109,10 +115,9 @@ func TestSwappedUsersConfirm(t *testing.T) {
 		t.Errorf("Error getting game by user id after swap: %v", err.Error())
 	}
 
-	if game.GameID != gameID || game.WordID != wordID || game.GuessingUserID != creatingUser || game.WordCreatorID != guessingUser {
+	if game.GameID != gameID || game.WordID != -1 || game.GuessingUserID != creatingUser || game.WordCreatorID != guessingUser {
 		t.Errorf("Error swapping users for game: %v", game)
 	}
-	t.Log(game)
 }
 
 func TestRemoveGame(t *testing.T) {

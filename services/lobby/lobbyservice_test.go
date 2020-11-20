@@ -3,10 +3,24 @@ package lobby
 import (
 	"reflect"
 	"testing"
-
 	"github.com/bjackson13/hangman/models/user"
+	"github.com/bjackson13/hangman/services/config"
+	"os"
 )
 
+func TestMain(m *testing.M) {
+	setup()
+	code := m.Run()
+	os.Exit(code)
+}
+
+func setup() {
+	var err error
+	err = config.LoadEnvVariables()
+	if err != nil{
+		panic("Failed to load env variables")
+	}
+}
 func TestService_AddUser(t *testing.T) {
 
 	type args struct {
