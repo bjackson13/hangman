@@ -23,7 +23,7 @@ func Connect() (*sql.DB, error) {
 	mysqlPass := os.Getenv("MYSQL_PASSWORD")
 	mysqlDB := os.Getenv("MYSQL_DB")
 
-	connString :=  mysqlUser + ":" + mysqlPass + "@/" + mysqlDB
+	connString :=  mysqlUser + ":" + mysqlPass + "@tcp(mysqlDB)/" + mysqlDB
 	conn, err := sql.Open("mysql", connString)
 	return conn, err
 }
