@@ -7,6 +7,7 @@ import (
 	"github.com/bjackson13/hangman/models/user"
 	"github.com/bjackson13/hangman/services/game"
 	"github.com/bjackson13/hangman/services/lobby"
+	"os"
 )
 
 /*RegisterAuthRoutes registering the paths for the authentication service*/
@@ -46,7 +47,7 @@ func login(c *gin.Context) {
 		}()
 		//while we perform database operations generate the secure token
 		token := authService.GenerateSessionToken(*authedUser)
-		c.SetCookie("hjt", token, 86400, "/", "localhost", false, true)
+		c.SetCookie("hjt", token, 86400, "/", os.Getenv("DOMAIN"), false, true)
 
 		users := <- userChan //wait for users
 		c.HTML(http.StatusOK, "lobby.html",gin.H{
