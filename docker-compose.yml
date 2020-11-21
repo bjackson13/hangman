@@ -1,13 +1,27 @@
 version: "3.5"
 services:
+    nginx:
+      image: nginx:latest
+      container_name: proxy
+      volumes:
+        - ./proxy/reverse-proxy.conf:/etc/nginx/conf.d/default.conf
+      ports:
+        - "80:80"
+        - "443:443"
+      depends_on: 
+        - app
+      links: 
+        - app
+      restart: always
+
     app:
       build: .
-      ports: 
-        - "8080:8080"
+      container_name: hangman
       links: 
         - db
       depends_on: 
         - db
+      restart: always
 
     db:
       image: mysql:8.0.22
@@ -22,5 +36,6 @@ services:
           - ./sql/sqlschema.sql:/data/application/init.sql
           - db_data:/var/lib/mysql
       restart: always
+
 volumes:
     db_data:
