@@ -12,6 +12,7 @@ services:
         - URL=${DOMAIN}
         - SUBDOMAINS=www,
         - VALIDATION=http
+        #- STAGING=true #uncomment for dev testing
       volumes:
         - ./proxy/reverse-proxy.conf:/config//nginx/site-confs/default
       ports:
