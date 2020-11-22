@@ -19,3 +19,10 @@
 /vendor/
 /Godeps/
 .env
+
+# certificates
+*.pem
+*.key
+*.crt
+*.cer
+*.priv
