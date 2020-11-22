@@ -8,6 +8,7 @@ import (
 	"github.com/bjackson13/hangman/services/game"
 	"github.com/bjackson13/hangman/services/lobby"
 	"os"
+	"log"
 )
 
 /*RegisterAuthRoutes registering the paths for the authentication service*/
@@ -33,6 +34,8 @@ func login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("pass")
 	authedUser, err := authService.AuthenticateUserLogin(username, password, c.ClientIP(), c.GetHeader("User-Agent"))
+	log.Print(username)
+	log.Print(password)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{
 			"error":  "Unauthorized, please log in to continue",

@@ -6,6 +6,7 @@ import (
 	tokenGen "github.com/brianvoe/sjwt"
 	"time"
 	"errors"
+	"log"
 )
 
 var SUPER_DUPER_SECRET_KEY []byte = []byte("OMG_50_5p00ky") //this will be moved... 
@@ -18,12 +19,12 @@ func AuthenticateUserLogin(username string, password string, requestIP string, r
 	if err != nil {
 		return nil, err
 	}
-	
+	log.Print(err)
 	validPwd := compareHashToString(user.GetPassword(), password)
 	if !validPwd {
 		return nil, errors.New("Invalid login")
 	}
-	
+	log.Print(err)
 	// Update our user identifiers in a go routine to save on time responding to the user request
 	go func() {
 		userRepo.UpdateUserIdentifiers(user.UserID, requestIP, requestUserAgent, time.Now().Unix())
