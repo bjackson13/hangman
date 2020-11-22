@@ -13,7 +13,7 @@ services:
         - SUBDOMAINS=www,
         - VALIDATION=http
       volumes:
-        - /proxy:/config
+        - ./proxy/reverse-proxy.conf:/config//nginx/site-confs/default
       ports:
         - 443:443
         - 80:80 
