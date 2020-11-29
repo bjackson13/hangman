@@ -61,7 +61,7 @@ func login(c *gin.Context) {
 /*logout clear out hjt cookie effectivley invalidating users session*/
 func logout(c *gin.Context) {
 	u := c.MustGet("authorized-user").(*user.User)
-	c.SetCookie("hjt", "", 0, "/", "localhost", false, true)
+	c.SetCookie("hjt", "", -1, "/", os.Getenv("DOMAIN"), false, true)
 	lobbyService := lobby.NewService()
 	gameService := games.NewService()
 
