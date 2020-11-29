@@ -21,6 +21,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			authedUser, err := authService.VerifyAndProcessToken(cookie.Value, c.ClientIP(), c.GetHeader("User-Agent"))
 			if err == nil {
 				authorized = true
+			} else {
+				log.Println(err)
 			}
 			
 			if authorized {
