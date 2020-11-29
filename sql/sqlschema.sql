@@ -1,3 +1,4 @@
+drop database if exists btj9560;
 create database btj9560;
 use btj9560;
 
