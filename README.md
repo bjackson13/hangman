@@ -33,6 +33,7 @@ In order to run the hangman app, there a few things we need to do.
 - **MYSQL_DB** - name of the DB in use. See SQL for this project (feel free to change if desired)
 - **MYSQL_ROOT_PASSWORD** - Change the root password
 - **DOMAIN** - domain in use to use for cookie creation. (If running locally use localhost)
+- **SALT** - a secret token for salting password hashes
 
 # Run It
 
