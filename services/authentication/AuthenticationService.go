@@ -44,7 +44,7 @@ func GenerateSessionToken(validUser user.User) string {
 	token.Set("lastlogin", validUser.LastLogin)
 
 	//set expiration
-	token.SetExpiresAt(time.Unix(validUser.LastLogin, 0).Add(time.Hour * 24))
+	token.SetExpiresAt(time.Now().Add(time.Hour * 24))
 
 	finaltoken := token.Generate(SUPER_DUPER_SECRET_KEY)
 

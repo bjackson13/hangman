@@ -8,6 +8,7 @@ import (
 	"github.com/bjackson13/hangman/services/lobby"
 	"github.com/bjackson13/hangman/models/user"
 	"time"
+	"log"
 )
 
 var lobbyChatID int = -404
@@ -20,6 +21,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			authedUser, err := authService.VerifyAndProcessToken(cookie.Value, c.ClientIP(), c.GetHeader("User-Agent"))
 			if err == nil {
 				authorized = true
+			} else {
+				log.Println(err)
 			}
 			
 			if authorized {
@@ -28,6 +31,8 @@ func AuthMiddleware() gin.HandlerFunc {
 				c.Next()
 				return
 			}
+		} else {
+			log.Println(err)
 		}
 		
 		// if unauthorized
