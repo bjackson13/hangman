@@ -7,7 +7,6 @@ import (
 	"time"
 	"errors"
 	"os"
-	"log"
 )
 
 var SUPER_DUPER_SECRET_KEY []byte = []byte(os.Getenv("SALT")) //this will be moved... 
@@ -63,13 +62,7 @@ func VerifyAndProcessToken(token string, requestIP string, requestUA string) (*u
 	if !checkSessionExpired(token) { return nil, errors.New("Expired Session Token") }
 	parsedUser, err := parseSessionToken(token)
 	if err != nil { return nil, err }
-	if parsedUser.IP != requestIP || parsedUser.UserAgent != requestUA { 
-		log.Println(parsedUser.IP)
-		log.Println(requestIP)
-		log.Println(parsedUser.UserAgent)
-		log.Println(requestUA)
-		return nil, errors.New("Bad Request") 
-	}
+	if parsedUser.IP != requestIP || parsedUser.UserAgent != requestUA { return nil, errors.New("Bad Request") }
 	return parsedUser, nil
 }
 
