@@ -28,8 +28,11 @@ func AuthenticateUserLogin(username string, password string, requestIP string, r
 	}
 	
 	// Update our user identifiers
-	userRepo.UpdateUserIdentifiers(user.UserID, requestIP, requestUserAgent, time.Now().Unix())
-	
+	lastLogin := time.Now().Unix()
+	userRepo.UpdateUserIdentifiers(user.UserID, requestIP, requestUserAgent, lastLogin)
+	user.IP = requestIP
+	user.UserAgent = requestUserAgent
+	user.LastLogin = lastLogin
 	return user, nil
 	
 }
