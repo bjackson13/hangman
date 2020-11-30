@@ -50,11 +50,7 @@ func login(c *gin.Context) {
 		c.SetCookie("hjt", token, 86400, "/", os.Getenv("DOMAIN"), false, true)
 
 		users := <- userChan //wait for users
-		c.HTML(http.StatusOK, "lobby.html",gin.H{
-			"title": "Lobby",
-			"user":	authedUser.Username,
-			"LobbyUsers": users,
-		})
+		c.Redirect(http.StatusFound, "/")
 	}
 }
 
