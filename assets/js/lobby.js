@@ -13,13 +13,9 @@ function refreshLobbyUsers() {
     });
 }
 
-setInterval(refreshLobbyUsers, 6000)
 /*Endlobby user refresh */
 
 /*Invite player functionality */
-/*Set interval checks */
-setInterval(checkInvite, 5000)
-
 function invitePlayer(userID) {
     $.ajax({
         url: `/lobby/invite/user/${userID}`, type: "POST", success: function (result) {
@@ -75,3 +71,9 @@ function denyInvite() {
     });
 }
 /*End invite section */
+
+$( document ).ready(function() {
+    /*Set interval checks */
+    setInterval(refreshLobbyUsers, 5000);
+    setInterval(checkInvite, 5000);
+});
