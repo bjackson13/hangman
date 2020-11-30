@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var SUPER_DUPER_SECRET_KEY []byte = []byte(os.Getenv("DOMAIN")) //this will be moved... 
+var SUPER_DUPER_SECRET_KEY []byte = []byte(os.Getenv("SALT")) //this will be moved... 
 
 /*AuthenticateUserLogin - authenticates a users credentials and returns the user or an error*/
 func AuthenticateUserLogin(username string, password string, requestIP string, requestUserAgent string) (*user.User, error) {
