@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var SUPER_DUPER_SECRET_KEY []byte = []byte(os.Getenv("DOMAIN")) //this will be moved... 
+var SUPER_DUPER_SECRET_KEY []byte = []byte(os.Getenv("SALT")) //this will be moved... 
 
 /*AuthenticateUserLogin - authenticates a users credentials and returns the user or an error*/
 func AuthenticateUserLogin(username string, password string, requestIP string, requestUserAgent string) (*user.User, error) {
@@ -27,8 +27,11 @@ func AuthenticateUserLogin(username string, password string, requestIP string, r
 	}
 	
 	// Update our user identifiers
-	userRepo.UpdateUserIdentifiers(user.UserID, requestIP, requestUserAgent, time.Now().Unix())
-	
+	lastLogin := time.Now().Unix()
+	userRepo.UpdateUserIdentifiers(user.UserID, requestIP, requestUserAgent, lastLogin)
+	user.IP = requestIP
+	user.UserAgent = requestUserAgent
+	user.LastLogin = lastLogin
 	return user, nil
 	
 }
@@ -44,7 +47,7 @@ func GenerateSessionToken(validUser user.User) string {
 	token.Set("lastlogin", validUser.LastLogin)
 
 	//set expiration
-	token.SetExpiresAt(time.Unix(validUser.LastLogin, 0).Add(time.Hour * 24))
+	token.SetExpiresAt(time.Now().Add(time.Hour * 24))
 
 	finaltoken := token.Generate(SUPER_DUPER_SECRET_KEY)
 

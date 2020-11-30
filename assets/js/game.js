@@ -15,8 +15,6 @@ function checkGuesses() {
     });   
 }
 
-var checkGuessesID = setInterval(checkGuesses, 5000);
-
 function checkGameStatus() {
     $.ajax({
         url: `/game/status`, type: "GET", 
@@ -31,8 +29,6 @@ function checkGameStatus() {
         }
     }); 
 }
-
-var checkStatusID = setInterval(checkGameStatus, 5000);
 
 function drawHangman(count) {
 
@@ -82,3 +78,11 @@ function endGame() {
     clearInterval(checkGuessesID);
     clearInterval(checkStatusID);
 }
+/*Used to stop intervals */
+var checkGuessesID
+var checkStatusID
+$( document ).ready(function() {
+    /*Set interval checks */
+    checkGuessesID = setInterval(checkGuesses, 5000);
+    checkStatusID = setInterval(checkGameStatus, 5000);
+});
