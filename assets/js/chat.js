@@ -5,11 +5,11 @@ function getNewMessages() {
         url: `/chat/since/${LAST_UPDATED_CHAT}`, type: "GET", 
         success: function (result) {
             if(!result.responseJSON) {
+                LAST_UPDATED_CHAT = Math.floor(Date.now() / 1000);
                 $("#messages").append(result);
                 if ($("#messages li").length != 0) {
                     $("#message-list-container").scrollTop($("#messages li").last().position().top + $('ul li').last().height());
                 }
-                LAST_UPDATED_CHAT = Math.floor(Date.now() / 1000);
             }
         },
         error: function(result) {
