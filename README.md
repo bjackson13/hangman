@@ -41,3 +41,13 @@ I have attempted to make running this as easy as possible. Ready?
 1. `docker-compose up`
 
 And that's it. That's hangman. Pretty good, pretty pretty good. 
+
+### What if I want to run it locally?
+If you want to run this locally: 
+- Make sure you have MySQL installed already
+- Dump the sql file under `sql/` into your MySQL server
+- You can run the application 2 different ways:
+  - Build the app using `go build main.go` and then `./main` to start the app
+  - Or simply `go run main.go` to quickly spin it up
+- Access the app locally at `localhost:8080`
+
