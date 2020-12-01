@@ -32,7 +32,7 @@ In order to run the hangman app, there a few things we need to do.
 - **MYSQL_PASSWORD** - set a password for the above user
 - **MYSQL_DB** - name of the DB in use. See SQL for this project (feel free to change if desired)
 - **MYSQL_ROOT_PASSWORD** - Change the root password
-- **DOMAIN** - domain in use to use for cookie creation and registering certs. (you need an actual domain, using `localhost` or `127.0.0.1` will result in an error)
+- **DOMAIN** - domain in use to use for cookie creation and registering certs. (**IF USING COMPOSE:** you need an actual domain, using `localhost` or `127.0.0.1` will result in an error)
 - **SALT** - a secret token for salting password hashes
 
 # Run It
@@ -44,6 +44,7 @@ And that's it. That's hangman. Pretty good, pretty pretty good.
 
 ### What if I want to run it locally?
 If you want to run this locally: 
+- Make sure your environment variables are in a .env file like normal
 - Make sure you have MySQL installed already
 - Dump the sql file under `sql/` into your MySQL server
 - You can run the application 2 different ways:
